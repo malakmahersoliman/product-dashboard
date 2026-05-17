@@ -1,0 +1,49 @@
+<h2> Products</h2>
+
+@if (products.length === 0 ){
+    <p>No products found.</p>
+}
+<!-- @else {
+   <section>
+  <h2>Products</h2>
+
+  <input
+    type="text"
+    placeholder="Search products..."
+    [(ngModel)]="searchText"
+  />
+
+  <label>
+    <input
+      type="checkbox"
+      [(ngModel)]="showOnlyAvailable"
+    />
+    Show only available products
+  </label>
+
+  <p>Total shown: {{ filteredProducts.length }}</p>
+
+  @if (filteredProducts.length === 0) {
+    <p>No products match your search.</p>
+  } @else {
+    <div class="grid">
+      @for (product of filteredProducts; track product.id) {
+        <div class="card">
+          <h3>{{ product.name | uppercase }}</h3>
+
+          <p>Category: {{ product.category }}</p>
+          <p>Price: {{ product.price | currency:'EGP ' }}</p>
+          <p>Discount: {{ product.price * 0.9 | currency:'EGP ' }}</p>
+          <p>Created: {{ product.createdAt | date:'mediumDate' }}</p>
+
+          @if (product.inStock) {
+            <p class="available">Available</p>
+          } @else {
+            <p class="out">Out of stock</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>
+} -->

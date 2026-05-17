@@ -1,0 +1,13 @@
+@if (isLoading) {
+  <p>Loading product...</p>
+} @else if (errorMessage) {
+  <p>{{ errorMessage }}</p>
+} @else if (!product) {
+  <p>Product not found.</p>
+} @else {
+  <h2>{{ product.title }}</h2>
+  <img [src]="product.thumbnail" [alt]="product.title" />
+  <p>{{ product.description }}</p>
+  <p>Price: {{ product.price }}</p>
+  <p>Stock: {{ product.stock }}</p>
+}
