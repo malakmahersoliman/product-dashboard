@@ -1,14 +1,24 @@
 export interface Product {
   id: number;
-  title: string;
-  description: string;
+  name: string;
   category: string;
   price: number;
-  discountPercentage: number;
-  rating: number;
   stock: number;
-  tags: string[];
-  brand?: string;
-  images: string[];
-  thumbnail: string;
+  isAvailable: boolean;
+}
+
+export interface CreateProductRequest {
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  isAvailable: boolean;
+}
+
+export interface UpdateProductRequest {
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  isAvailable: boolean;
 }

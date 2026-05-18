@@ -17,9 +17,24 @@ export const routes: Routes = [
         import('./pages/add-product/add-product').then(m => m.AddProduct)
    },
    {
+    path: 'products/:id/edit',
+    loadComponent: () =>
+        import('./pages/edit-product/edit-product').then(m => m.EditProduct)
+   },
+   {
     path: 'products/:id',
     loadComponent: () => 
         import('./pages/product-details/product-details').then(m => m.ProductDetails)
+   },
+   {
+    path: 'customers',
+    loadComponent: () =>
+        import('./pages/customers/customers').then(m => m.Customers)
+   },
+   {
+    path: 'customers/new',
+    loadComponent: () =>
+        import('./pages/add-customer/add-customer').then(m => m.AddCustomer)
    },
    {
     path:'about',

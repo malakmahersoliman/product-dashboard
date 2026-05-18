@@ -1,13 +1,29 @@
 <div class="product-card">
-  <img [src]="product.thumbnail" [alt]="product.title" />
+  <div class="card-header">
+    <h3>{{ product.name }}</h3>
 
-  <h3>{{ product.title }}</h3>
+    @if (product.isAvailable) {
+      <span class="badge available">Available</span>
+    } @else {
+      <span class="badge unavailable">Out of Stock</span>
+    }
+  </div>
 
-  <p>{{ product.description }}</p>
+  <p class="category">{{ product.category }}</p>
 
-<p class="price">Price: {{ product.price }}</p>
-<p class="stock">Stock: {{ product.stock }}</p>
-<a class="details-btn" [routerLink]="['/products', product.id]">
-  View Details
-</a>
+  <div class="info-row">
+    <span>Price</span>
+    <strong>{{ product.price }}</strong>
+  </div>
+
+  <div class="info-row">
+    <span>Stock</span>
+    <strong>{{ product.stock }}</strong>
+  </div>
+
+  <div class="actions">
+    <a class="details-btn" [routerLink]="['/products', product.id]">View</a>
+    <a class="edit-btn" [routerLink]="['/products', product.id, 'edit']">Edit</a>
+   <button class="delete-btn" (click)="onDeleteClick()">Delete</button> 
+  </div>
 </div>

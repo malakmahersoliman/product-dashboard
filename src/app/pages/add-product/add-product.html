@@ -1,70 +1,18 @@
 <section class="add-product-page">
   <h2>Add Product</h2>
 
-  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <app-product-form
+    [productForm]="productForm"
+    [isSubmitting]="isSubmitting"
+    buttonText="Add Product"
+    (formSubmit)="onSubmit()">
+  </app-product-form>
 
-    <div>
-      <label>Title</label>
-      <input type="text" formControlName="title" />
+  @if (successMessage) {
+    <p class="success-message">{{ successMessage }}</p>
+  }
 
-      @if (productForm.get('title')?.touched && productForm.get('title')?.invalid) {
-        <small>Title is required and must be at least 3 characters.</small>
-      }
-    </div>
-
-    <div>
-      <label>Price</label>
-      <input type="number" formControlName="price" />
-
-      @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
-        <small>Price is required and must be at least 1.</small>
-      }
-    </div>
-
-    <div>
-      <label>Category</label>
-      <input type="text" formControlName="category" />
-
-      @if (productForm.get('category')?.touched && productForm.get('category')?.invalid) {
-        <small>Category is required.</small>
-      }
-    </div>
-
-    <div>
-      <label>Description</label>
-      <textarea formControlName="description"></textarea>
-
-      @if (productForm.get('description')?.touched && productForm.get('description')?.invalid) {
-        <small>Description is required and must be at least 10 characters.</small>
-      }
-    </div>
-
-    <div>
-      <label>Stock</label>
-      <input type="number" formControlName="stock" />
-
-      @if (productForm.get('stock')?.touched && productForm.get('stock')?.invalid) {
-        <small>Stock is required and cannot be negative.</small>
-      }
-    </div>
-
-    <div>
-      <label>Thumbnail URL</label>
-      <input type="text" formControlName="thumbnail" />
-    </div>
-
-    <button type="submit" [disabled]="isSubmitting">
-      @if (isSubmitting) {
-        Submitting...
-      }@else {
-        Add Product
-      }
-    </button>
-     @if (successMessage) {
-       <p class="success-message">{{successMessage}}</p>
-      }
-     @if(errorMessage) {
-       <p class="error-message"> {{errorMessage}}</p>
-      }
-  </form>
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  }
 </section>

@@ -1,13 +1,32 @@
 @if (isLoading) {
-  <p>Loading product...</p>
+  <p class="state-message">Loading product...</p>
 } @else if (errorMessage) {
-  <p>{{ errorMessage }}</p>
+  <p class="state-message">{{ errorMessage }}</p>
 } @else if (!product) {
-  <p>Product not found.</p>
+  <p class="state-message">Product not found.</p>
 } @else {
-  <h2>{{ product.title }}</h2>
-  <img [src]="product.thumbnail" [alt]="product.title" />
-  <p>{{ product.description }}</p>
-  <p>Price: {{ product.price }}</p>
-  <p>Stock: {{ product.stock }}</p>
+  <section class="details-page">
+    <div class="details-card">
+      <h2>{{ product.name }}</h2>
+      <p class="category">{{ product.category }}</p>
+
+      <div class="info-grid">
+        <div class="info-row">
+          <span>Price</span>
+          <strong>{{ product.price }}</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Stock</span>
+          <strong>{{ product.stock }}</strong>
+        </div>
+      </div>
+
+      @if (product.isAvailable) {
+        <span class="badge available">Available</span>
+      } @else {
+        <span class="badge unavailable">Out of Stock</span>
+      }
+    </div>
+  </section>
 }

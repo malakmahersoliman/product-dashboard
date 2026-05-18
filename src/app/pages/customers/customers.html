@@ -1,0 +1,33 @@
+<section class="customers-page">
+  <div class="page-header">
+    <div>
+      <h2>Customers</h2>
+      <p>Manage customer records used for orders.</p>
+    </div>
+
+    <a class="primary-btn" routerLink="/customers/new">Add Customer</a>
+  </div>
+
+  @if (isLoading) {
+    <p class="state-message">Loading customers...</p>
+  } @else if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  } @else if (customers.length === 0) {
+    <p class="state-message">No customers found.</p>
+  } @else {
+    <div class="customers-grid">
+      @for (customer of customers; track customer.id) {
+        <article class="customer-card">
+          <div class="avatar">
+            {{ customer.name.charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="customer-info">
+            <h3>{{ customer.name }}</h3>
+            <p>{{ customer.email }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

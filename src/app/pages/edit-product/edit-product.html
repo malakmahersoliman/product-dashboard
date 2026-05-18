@@ -1,0 +1,14 @@
+<section class="add-product-page">
+  <h2>Edit Product</h2>
+
+  @if (isLoading) {
+    <p>Loading product...</p>
+  } @else {
+    <app-product-form
+      [productForm]="productForm"
+      [isSubmitting]="isSubmitting"
+      buttonText="Update Product"
+      (formSubmit)="onSubmit()">
+    </app-product-form>
+  }
+</section>

@@ -1,4 +1,4 @@
-import { Component , OnInit ,ChangeDetectorRef } from '@angular/core';
+import { Component , OnInit , ChangeDetectorRef} from '@angular/core';
 import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { ActivatedRoute } from '@angular/router';
@@ -19,8 +19,8 @@ export class ProductDetails implements OnInit {
 
   constructor(
     private productService: ProductService,
-      private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -37,6 +37,7 @@ export class ProductDetails implements OnInit {
         this.product = response;
         this.isLoading = false;
         this.cdr.markForCheck();
+  
       },
       error: (error) => {
         this.errorMessage = 'Failed to load product. Please try again later.';

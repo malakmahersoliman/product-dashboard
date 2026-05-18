@@ -1,0 +1,50 @@
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Name</label>
+    <input type="text" formControlName="name" />
+
+    @if (productForm.get('name')?.touched && productForm.get('name')?.invalid) {
+      <small>Name is required and must be at most 200 characters.</small>
+    }
+  </div>
+
+  <div>
+    <label>Category</label>
+    <input type="text" formControlName="category" />
+
+    @if (productForm.get('category')?.touched && productForm.get('category')?.invalid) {
+      <small>Category is required and must be at most 100 characters.</small>
+    }
+  </div>
+
+  <div>
+    <label>Price</label>
+    <input type="number" formControlName="price" />
+
+    @if (productForm.get('price')?.touched && productForm.get('price')?.invalid) {
+      <small>Price is required and must be greater than 0.</small>
+    }
+  </div>
+
+  <div>
+    <label>Stock</label>
+    <input type="number" formControlName="stock" />
+
+    @if (productForm.get('stock')?.touched && productForm.get('stock')?.invalid) {
+      <small>Stock is required and cannot be negative.</small>
+    }
+  </div>
+
+  <label class="checkbox-row">
+    <input type="checkbox" formControlName="isAvailable" />
+    Available
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">
+    @if (isSubmitting) {
+      Submitting...
+    } @else {
+      {{ buttonText }}
+    }
+  </button>
+</form>
