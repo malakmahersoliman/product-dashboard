@@ -3,7 +3,10 @@ import {  inject,Injectable } from '@angular/core';
 import { Customer , CreateCustomerRequest} from '../models/customer.model';
 import { Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  
+  providedIn: 'root',
+})
 export class CustomerService {
   private http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5023/api/customers';

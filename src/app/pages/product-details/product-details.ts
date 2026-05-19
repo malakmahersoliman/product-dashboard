@@ -39,12 +39,10 @@ export class ProductDetails implements OnInit {
         this.cdr.markForCheck();
   
       },
-      error: (error) => {
+      error: () => {
         this.errorMessage = 'Failed to load product. Please try again later.';
         this.isLoading = false;
         this.cdr.markForCheck();
-        console.error(error);
-
       }
     });
   }

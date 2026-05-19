@@ -1,11 +1,11 @@
 import { Component, OnInit ,ChangeDetectorRef, inject} from '@angular/core';
 import { CustomerService } from '../../services/customer.service';
 import { Customer } from '../../models/customer.model';
-
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-customers',
-  imports: [],
+  imports: [RouterLink],
   providers: [CustomerService],
   templateUrl: './customers.html',
   styleUrl: './customers.css',
@@ -33,12 +33,10 @@ export class Customers implements OnInit {
           this.cdr.markForCheck();
                 
         },
-        error: (error) => {
-          console.log('API error:', error);
-          this.errorMessage = 'Failed to load Customer. Please try again later.';
+        error: () => {
+          this.errorMessage = 'Failed to load customers. Please try again later.';
           this.isLoading = false;
           this.cdr.markForCheck();
-          console.error(error);
         }
        });
 

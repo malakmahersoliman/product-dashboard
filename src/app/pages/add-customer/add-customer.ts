@@ -42,10 +42,9 @@ export class AddCustomer {
         this.router.navigate(['/customers']);
 
       },
-      error: (error) => {
+      error: () => {
         this.errorMessage = 'Failed to add customer. Please try again.';
         this.isSubmitting = false;
-        console.error(error);
       }
     });
   }

@@ -46,10 +46,9 @@ export class AddProduct {
         this.router.navigate(['/products']);
 
       },
-      error: (error) => {
+      error: () => {
         this.errorMessage = 'Failed to add product. Please try again.';
         this.isSubmitting = false;
-        console.error(error);
       }
     });
   }

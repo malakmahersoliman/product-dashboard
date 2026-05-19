@@ -1,0 +1,85 @@
+@if (isLoading) {
+  <p class="state-message">Loading order...</p>
+} @else if (errorMessage && !order) {
+  <p class="error-message">{{ errorMessage }}</p>
+} @else if (!order) {
+  <p class="state-message">Order not found.</p>
+} @else {
+  <section class="details-page">
+    <a class="back-link" routerLink="/orders">← Back to orders</a>
+
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+
+    <div class="details-card">
+      <div class="details-header">
+        <h2>Order #{{ order.id }}</h2>
+        <span
+          class="status-badge"
+          [class.status-completed]="isCompleted()"
+          [class.status-pending]="!isCompleted()"
+        >
+          {{ order.status }}
+        </span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-row">
+          <span>Customer</span>
+          <strong>{{ order.customerName }}</strong>
+        </div>
+        <div class="info-row">
+          <span>Order date</span>
+          <strong>{{ order.orderDate | date: 'medium' }}</strong>
+        </div>
+        <div class="info-row">
+          <span>Total</span>
+          <strong>{{ order.totalAmount | currency }}</strong>
+        </div>
+        <div class="info-row">
+          <span>Items</span>
+          <strong>{{ order.items.length }}</strong>
+        </div>
+      </div>
+
+      <div class="items-section">
+        <h3>Order items</h3>
+
+        <div class="items-table">
+          <div class="items-header">
+            <span>Product</span>
+            <span>Qty</span>
+            <span>Unit price</span>
+            <span>Subtotal</span>
+          </div>
+
+          @for (item of order.items; track item.id) {
+            <div class="items-row">
+              <span>{{ item.productName }}</span>
+              <span>{{ item.quantity }}</span>
+              <span>{{ item.unitPrice | currency }}</span>
+              <span>{{ item.subtotal | currency }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="details-actions">
+        @if (!isCompleted()) {
+          <button type="button" (click)="onUpdateStatus()" [disabled]="isUpdating">
+            @if (isUpdating) {
+              Updating...
+            } @else {
+              Mark complete
+            }
+          </button>
+        }
+
+        <button type="button" class="delete-btn" (click)="onDeleteOrder()">
+          Delete order
+        </button>
+      </div>
+    </div>
+  </section>
+}

@@ -1,0 +1,157 @@
+.orders-page {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.primary-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #111827;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.orders-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.order-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.page-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+}
+
+.state-message,
+.error-message {
+  padding: 14px;
+  border-radius: 10px;
+  background: #f9fafb;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.status-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.completed-label {
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.order-items {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.order-items h4 {
+  margin: 0 0 10px;
+  color: #111827;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 1.5fr 0.7fr 0.8fr 0.8fr;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f9fafb;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  align-items: center;
+}
+
+.order-actions .view-btn {
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  color: #111827;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.order-actions .view-btn:hover {
+  background: #d1d5db;
+}
+
+.order-actions button {
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #111827;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.order-actions .delete-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.order-actions button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.order-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

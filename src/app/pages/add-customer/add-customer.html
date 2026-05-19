@@ -1,11 +1,38 @@
 <section class="add-customer-page">
   <h2>Add Customer</h2>
 
+  <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label>Name</label>
+      <input type="text" formControlName="name" />
 
-  
+      @if (customerForm.get('name')?.touched && customerForm.get('name')?.invalid) {
+        <small>Name is required and must be at most 200 characters.</small>
+      }
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input type="email" formControlName="email" />
+
+      @if (customerForm.get('email')?.touched && customerForm.get('email')?.invalid) {
+        <small>Please enter a valid email.</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="isSubmitting">
+      @if (isSubmitting) {
+        Submitting...
+      } @else {
+        Add Customer
+      }
+    </button>
+  </form>
+
   @if (successMessage) {
     <p class="success-message">{{ successMessage }}</p>
   }
+
   @if (errorMessage) {
     <p class="error-message">{{ errorMessage }}</p>
   }

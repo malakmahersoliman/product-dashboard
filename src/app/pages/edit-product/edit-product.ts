@@ -55,12 +55,10 @@ export class EditProduct implements OnInit {
           this.productForm.patchValue(response);
     
         },
-        error: (error) => {
+        error: () => {
           this.errorMessage = 'Failed to load product. Please try again later.';
           this.isLoading = false;
           this.cdr.markForCheck();
-          console.error(error);
-
         }
       });
     }
@@ -77,11 +75,16 @@ export class EditProduct implements OnInit {
     this.successMessage = null;
     this.errorMessage = null;
 
-    this.productService.updateProduct(this.productId,this.productForm.value).subscribe({
+    this.productService.updateProduct(this.productId, this.productForm.value).subscribe({
       next: () => {
         this.successMessage = 'Product updated successfully.';
         this.router.navigate(['/products']);
-      }
+      },
+      error: () => {
+        this.errorMessage = 'Failed to update product. Please try again.';
+        this.isSubmitting = false;
+        this.cdr.markForCheck();
+      },
     });
 
   }

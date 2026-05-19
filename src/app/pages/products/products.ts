@@ -30,22 +30,14 @@ export class Products implements OnInit {
       this.productService.getProducts().subscribe({
 
       next: (response) => {
-
-          console.log('Success:', response);
-          console.log('Products:', response);
           this.products = response;
           this.isLoading = false;
           this.cdr.markForCheck();
-          console.log('isLoading:', this.isLoading);
-          console.log('products length:', this.products.length);
-                
         },
-        error: (error) => {
-          console.log('API error:', error);
+        error: () => {
           this.errorMessage = 'Failed to load products. Please try again later.';
           this.isLoading = false;
           this.cdr.markForCheck();
-          console.error(error);
         }
        });
     }
@@ -65,8 +57,7 @@ export class Products implements OnInit {
       this.successMessage = 'Product deleted successfully.';
       this.cdr.markForCheck();
     },
-    error: (error) => {
-      console.log('API error:', error);
+    error: () => {
       this.errorMessage = 'Failed to delete product.';
       this.cdr.markForCheck();
     }
