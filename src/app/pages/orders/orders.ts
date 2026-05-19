@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OrderResponse, ORDER_STATUS } from '../../models/order.model';
+import { ORDER_STATUS, OrderResponse, OrderStatus } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 import { RouterLink } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { RouterLink } from '@angular/router';
 export class Orders implements OnInit {
   orders: OrderResponse[] = [];
   isLoading = false;
+  ORDER_STATUS = ORDER_STATUS;
   errorMessage: string | null = null;
   updatingOrderId: number | null = null;
 
@@ -28,6 +29,7 @@ export class Orders implements OnInit {
   loadOrders(): void {
     this.isLoading = true;
     this.errorMessage = null;
+    
 
     this.orderService.getOrders().subscribe({
       next: (response) => {
@@ -47,11 +49,11 @@ export class Orders implements OnInit {
     return order.status === ORDER_STATUS.completed;
   }
 
-  onUpdateStatus(id: number): void {
+  onUpdateStatus(id: number, status: OrderStatus): void {
     this.updatingOrderId = id;
     this.errorMessage = null;
 
-    this.orderService.updateOrderStatus(id, ORDER_STATUS.completed).subscribe({
+    this.orderService.updateOrderStatus(id, status).subscribe({
       next: () => {
         const order = this.orders.find((o) => o.id === id);
         if (order) {

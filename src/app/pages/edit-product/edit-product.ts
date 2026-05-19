@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { FormGroup,FormBuilder,Validators } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
-import { ActivatedRoute,Router } from '@angular/router';
+import { ActivatedRoute,Router, RouterLink } from '@angular/router';
 import { ProductForm } from '../../components/product-form/product-form';
 
 
@@ -10,7 +10,7 @@ import { ProductForm } from '../../components/product-form/product-form';
 
 @Component({
   selector: 'app-edit-product',
-  imports: [ProductForm],
+  imports: [ProductForm,RouterLink],
   templateUrl: './edit-product.html',
   styleUrl: './edit-product.css',
 })

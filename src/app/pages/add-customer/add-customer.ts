@@ -1,12 +1,12 @@
 import { Component ,inject } from '@angular/core';
 import { CustomerService } from '../../services/customer.service';
 import { FormBuilder , FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-add-customer',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule,RouterLink],
   providers: [CustomerService],
   templateUrl: './add-customer.html',
   styleUrl: './add-customer.css',

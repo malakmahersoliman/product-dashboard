@@ -2,10 +2,10 @@ import { Component, inject } from '@angular/core';
 import {  FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { ProductForm } from '../../components/product-form/product-form';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-add-product',
-  imports: [ProductForm],
+  imports: [ProductForm,RouterLink],
   templateUrl: './add-product.html',
   styleUrl: './add-product.css',
 })

@@ -1,9 +1,10 @@
-/** Status values your API accepts (must match backend exactly). */
 export const ORDER_STATUS = {
   pending: 'Pending',
   completed: 'Completed',
   cancelled: 'Cancelled',
 } as const;
+
+export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
 
 export interface OrderItemResponse {
   id: number;

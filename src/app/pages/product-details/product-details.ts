@@ -1,12 +1,12 @@
 import { Component , OnInit , ChangeDetectorRef} from '@angular/core';
 import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-product-details',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css',
 })

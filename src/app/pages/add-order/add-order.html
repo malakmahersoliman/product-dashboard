@@ -69,7 +69,10 @@
         }
       </div>
     </div>
-
+    <div class="order-summary">
+      <span>Estimated Total</span>
+      <strong>{{ getEstimatedTotal() | currency }}</strong>
+    </div>
     <button type="submit" class="submit-btn" [disabled]="isSubmitting">
       @if (isSubmitting) {
         Creating...

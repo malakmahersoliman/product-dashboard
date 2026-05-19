@@ -26,17 +26,31 @@
             <h3>Order #{{ order.id }}</h3>
             <span
               class="status-badge"
-              [class.status-completed]="isCompleted(order)"
-              [class.status-pending]="!isCompleted(order)"
+              [class.status-completed]="order.status === ORDER_STATUS.completed"
+              [class.status-pending]="order.status === ORDER_STATUS.pending"
+              [class.status-cancelled]="order.status === ORDER_STATUS.cancelled"
             >
               {{ order.status }}
             </span>
           </div>
 
           <p>Customer: {{ order.customerName }}</p>
-          <p>Total: {{ order.totalAmount | currency }}</p>
-          <p>Items: {{ order.items.length }}</p>
-          <p>Date: {{ order.orderDate | date: 'medium' }}</p>
+          <div class="order-summary">
+            <div>
+              <span>Total Amount</span>
+              <strong>{{ order.totalAmount | currency }}</strong>
+            </div>
+
+            <div>
+              <span>Items</span>
+              <strong>{{ order.items.length }}</strong>
+            </div>
+
+            <div>
+              <span>Date</span>
+              <strong>{{ order.orderDate | date: 'mediumDate' }}</strong>
+            </div>
+          </div>
 
           <div class="order-items">
             <h4>Items</h4>
@@ -50,34 +64,29 @@
               </div>
             }
           </div>
+            <div class="order-actions">
+      <a class="view-btn" [routerLink]="['/orders', order.id]">View</a>
 
-          <div class="order-actions">
-            <a class="view-btn" [routerLink]="['/orders', order.id]">View</a>
+      @if (order.status === ORDER_STATUS.pending) {
+        <button (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)">
+          Complete
+        </button>
 
-            @if (!isCompleted(order)) {
-              <button
-                type="button"
-                (click)="onUpdateStatus(order.id)"
-                [disabled]="updatingOrderId === order.id"
-              >
-                @if (updatingOrderId === order.id) {
-                  Updating...
-                } @else {
-                  Mark complete
-                }
-              </button>
-            } @else {
-              <span class="completed-label">Completed</span>
-            }
+        <button class="cancel-btn" (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)">
+          Cancel
+        </button>
+      } @else {
+        <span class="completed-label">{{ order.status }}</span>
+      }
 
-            <button
-              type="button"
-              class="delete-btn"
-              (click)="onDeleteOrder(order.id)"
-            >
-              Delete
-            </button>
-          </div>
+      <button
+        type="button"
+        class="delete-btn"
+        (click)="onDeleteOrder(order.id)"
+      >
+        Delete
+      </button>
+    </div>
         </article>
       }
     </div>

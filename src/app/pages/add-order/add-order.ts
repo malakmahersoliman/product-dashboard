@@ -41,7 +41,7 @@ export class AddOrder implements OnInit {
   ) {
     this.orderForm = this.fb.group({
       customerId: ['', Validators.required],
-      items: this.fb.array([this.createItemGroup(), this.createItemGroup()]),
+      items: this.fb.array([this.createItemGroup()]),
     });
   }
 
@@ -125,5 +125,19 @@ export class AddOrder implements OnInit {
         this.isSubmitting = false;
       },
     });
+  }
+    getEstimatedTotal(): number {
+    return this.items.controls.reduce((total, control) => {
+      const productId = Number(control.get('productId')?.value);
+      const quantity = Number(control.get('quantity')?.value);
+
+      const product = this.products.find(p => p.id === productId);
+
+      if (!product || !quantity) {
+        return total;
+      }
+
+      return total + product.price * quantity;
+    }, 0);
   }
 }

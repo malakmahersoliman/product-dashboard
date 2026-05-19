@@ -1,6 +1,12 @@
 <section class="products-page">
-  <h2>Products Page</h2>
-  
+    <div class="page-header">
+      <div>
+        <h2>Products</h2>
+        <p>Manage products, stock, and availability.</p>
+      </div>
+
+      <a class="primary-btn" routerLink="/products/new">Add Product</a>
+    </div>
     @if (isLoading) {
       <p class="state-message">Loading products...</p>
     } @else if (errorMessage) {
