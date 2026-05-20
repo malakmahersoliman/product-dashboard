@@ -19,76 +19,95 @@
   } @else if (orders.length === 0) {
     <p class="state-message">No orders found.</p>
   } @else {
-    <div class="orders-grid">
-      @for (order of orders; track order.id) {
-        <article class="order-card">
-          <div class="order-card-header">
-            <h3>Order #{{ order.id }}</h3>
-            <span
-              class="status-badge"
-              [class.status-completed]="order.status === ORDER_STATUS.completed"
-              [class.status-pending]="order.status === ORDER_STATUS.pending"
-              [class.status-cancelled]="order.status === ORDER_STATUS.cancelled"
-            >
-              {{ order.status }}
-            </span>
-          </div>
+    <div class="orders-table-wrapper">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Items</th>
+            <th>Date</th>
+            <th>Products</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-          <p>Customer: {{ order.customerName }}</p>
-          <div class="order-summary">
-            <div>
-              <span>Total Amount</span>
-              <strong>{{ order.totalAmount | currency }}</strong>
-            </div>
+        <tbody>
+          @for (order of orders; track order.id) {
+            <tr>
+              <td>#{{ order.id }}</td>
 
-            <div>
-              <span>Items</span>
-              <strong>{{ order.items.length }}</strong>
-            </div>
+              <td>{{ order.customerName }}</td>
 
-            <div>
-              <span>Date</span>
-              <strong>{{ order.orderDate | date: 'mediumDate' }}</strong>
-            </div>
-          </div>
+              <td>
+                <span
+                  class="status-badge"
+                  [class.status-completed]="order.status === ORDER_STATUS.completed"
+                  [class.status-pending]="order.status === ORDER_STATUS.pending"
+                  [class.status-cancelled]="order.status === ORDER_STATUS.cancelled"
+                >
+                  {{ order.status }}
+                </span>
+              </td>
 
-          <div class="order-items">
-            <h4>Items</h4>
+              <td>{{ order.totalAmount | currency }}</td>
 
-            @for (item of order.items; track item.id) {
-              <div class="order-item">
-                <span>{{ item.productName }}</span>
-                <span>Qty: {{ item.quantity }}</span>
-                <span>Unit: {{ item.unitPrice | currency }}</span>
-                <span>Subtotal: {{ item.subtotal | currency }}</span>
-              </div>
-            }
-          </div>
-            <div class="order-actions">
-      <a class="view-btn" [routerLink]="['/orders', order.id]">View</a>
+              <td>{{ order.items.length }}</td>
 
-      @if (order.status === ORDER_STATUS.pending) {
-        <button (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)">
-          Complete
-        </button>
+              <td>{{ order.orderDate | date: 'mediumDate' }}</td>
 
-        <button class="cancel-btn" (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)">
-          Cancel
-        </button>
-      } @else {
-        <span class="completed-label">{{ order.status }}</span>
-      }
+              <td>
+                <div class="order-products">
+                  @for (item of order.items; track item.id) {
+                    <div class="order-product-line">
+                      <span>{{ item.productName }}</span>
+                      <small>
+                        Qty: {{ item.quantity }} · Unit: {{ item.unitPrice | currency }} · Subtotal:
+                        {{ item.subtotal | currency }}
+                      </small>
+                    </div>
+                  }
+                </div>
+              </td>
 
-      <button
-        type="button"
-        class="delete-btn"
-        (click)="onDeleteOrder(order.id)"
-      >
-        Delete
-      </button>
-    </div>
-        </article>
-      }
+              <td>
+                <div class="table-actions">
+                  <a class="view-btn" [routerLink]="['/orders', order.id]">View</a>
+
+                  @if (order.status === ORDER_STATUS.pending) {
+                    <button
+                      type="button"
+                      (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)"
+                    >
+                      Complete
+                    </button>
+
+                    <button
+                      type="button"
+                      class="cancel-btn"
+                      (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)"
+                    >
+                      Cancel
+                    </button>
+                  } @else {
+                    <span class="completed-label">{{ order.status }}</span>
+                  }
+
+                  <button
+                    type="button"
+                    class="delete-btn"
+                    (click)="onDeleteOrder(order.id)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
   }
 </section>

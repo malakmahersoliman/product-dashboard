@@ -1,12 +1,16 @@
 <nav class="navbar">
-  <div class="brand">Product Dashboard</div>
+  <div class="brand">Store Dashboard</div>
 
   <div class="links">
+    @if (authService.isLoggedIn()) {
+      <a routerLink="/products" routerLinkActive="active">Products</a>
+      <a routerLink="/customers" routerLinkActive="active">Customers</a>
+      <a routerLink="/orders" routerLinkActive="active">Orders</a>
+      <a routerLink="/about" routerLinkActive="active">About</a>
 
-    <a routerLink="/orders" routerLinkActive="active">Orders</a>
-    <a routerLink="/products" routerLinkActive="active">Products</a>
-    <a routerLink="/customers" routerLinkActive="active">Customers</a>
-    <a routerLink="/about" routerLinkActive="active">About</a>
-
+      <button type="button" class="logout-btn" (click)="logout()">
+        Logout
+      </button>
+    }
   </div>
 </nav>

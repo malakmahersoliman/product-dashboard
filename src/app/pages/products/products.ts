@@ -58,8 +58,13 @@ export class Products implements OnInit {
       this.successMessage = 'Product deleted successfully.';
       this.cdr.markForCheck();
     },
-    error: () => {
-      this.errorMessage = 'Failed to delete product.';
+    error: (error) => {
+      if (error.status === 409) {
+        this.errorMessage = 'This product cannot be deleted because it is linked to existing orders.';
+      } else {
+        this.errorMessage = 'Failed to delete product. Please try again.';
+      }
+
       this.cdr.markForCheck();
     }
   });

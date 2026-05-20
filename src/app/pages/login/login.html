@@ -1,0 +1,42 @@
+<section class="login-page">
+  <div class="login-card">
+    <h2>Login</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label>Email</label>
+        <input type="email" formControlName="email" placeholder="admin@test.com" />
+
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+          <small>Please enter a valid email.</small>
+        }
+      </div>
+
+      <div>
+        <label>Password</label>
+        <input type="password" formControlName="password" placeholder="123456" />
+
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+          <small>Password is required.</small>
+        }
+      </div>
+
+      <button type="submit" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          Logging in...
+        } @else {
+          Login
+        }
+      </button>
+    </form>
+
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+
+    <!-- <div class="demo-credentials">
+      <strong>Demo:</strong>
+      <span>admin@test.com / 123456</span>
+    </div> -->
+  </div>
+</section>
