@@ -1,33 +1,55 @@
 @if (isLoading) {
-  <p class="state-message">Loading product...</p>
+  <section class="page-container">
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading product...</span>
+    </div>
+  </section>
 } @else if (errorMessage) {
-  <p class="state-message">{{ errorMessage }}</p>
+  <section class="page-container">
+    <p class="error-message">{{ errorMessage }}</p>
+  </section>
 } @else if (!product) {
-  <p class="state-message">Product not found.</p>
+  <section class="page-container">
+    <div class="empty-state">
+      <p>Product not found.</p>
+      <a class="primary-btn" routerLink="/products">Back to products</a>
+    </div>
+  </section>
 } @else {
-  <section class="details-page">
+  <section class="details-page page-container">
+    <a class="back-link" routerLink="/products">← Back to products</a>
+
     <div class="details-card">
-      <a class="back-link" routerLink="/products">← Back to products</a>
-      <h2>{{ product.name }}</h2>
-      <p class="category">{{ product.category }}</p>
-
-      <div class="info-grid">
-        <div class="info-row">
-          <span>Price</span>
-          <strong>{{ product.price }}</strong>
+      <div class="details-header">
+        <div>
+          <span class="category-tag">{{ product.category }}</span>
+          <h2>{{ product.name }}</h2>
         </div>
 
-        <div class="info-row">
-          <span>Stock</span>
-          <strong>{{ product.stock }}</strong>
-        </div>
+        @if (!product.isAvailable || product.stock === 0) {
+          <span class="badge badge-unavailable">Out of stock</span>
+        } @else if (isLowStock) {
+          <span class="badge badge-low-stock">Low stock</span>
+        } @else {
+          <span class="badge badge-available">Available</span>
+        }
       </div>
 
-      @if (product.isAvailable) {
-        <span class="badge available">Available</span>
-      } @else {
-        <span class="badge unavailable">Out of Stock</span>
-      }
+      <div class="summary-grid">
+        <div class="summary-item highlight">
+          <span>Price</span>
+          <strong>{{ product.price | currency }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Stock</span>
+          <strong>{{ product.stock }} units</strong>
+        </div>
+        <div class="summary-item">
+          <span>Status</span>
+          <strong>{{ product.isAvailable ? 'Available' : 'Unavailable' }}</strong>
+        </div>
+      </div>
     </div>
   </section>
 }

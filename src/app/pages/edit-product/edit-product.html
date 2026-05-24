@@ -1,15 +1,30 @@
-<section class="add-product-page">
+<section class="page-container">
   <a class="back-link" routerLink="/products">← Back to products</a>
-  <h2>Edit Product</h2>
+
+  <div class="page-header">
+    <div>
+      <h2>Edit Product</h2>
+      <p>Update product details and availability.</p>
+    </div>
+  </div>
 
   @if (isLoading) {
-    <p>Loading product...</p>
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading product...</span>
+    </div>
   } @else {
-    <app-product-form
-      [productForm]="productForm"
-      [isSubmitting]="isSubmitting"
-      buttonText="Update Product"
-      (formSubmit)="onSubmit()">
-    </app-product-form>
+    <div class="form-card">
+      <app-product-form
+        [productForm]="productForm"
+        [isSubmitting]="isSubmitting"
+        buttonText="Update Product"
+        (formSubmit)="onSubmit()"
+      ></app-product-form>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
   }
 </section>

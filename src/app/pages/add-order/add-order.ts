@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { forkJoin, Subscription } from 'rxjs';
 
 import { Customer } from '../../models/customer.model';
 import { Product } from '../../models/product.model';
@@ -23,14 +24,17 @@ import { OrderService } from '../../services/order.service';
   templateUrl: './add-order.html',
   styleUrl: './add-order.css',
 })
-export class AddOrder implements OnInit {
+export class AddOrder implements OnInit, OnDestroy {
   customers: Customer[] = [];
   products: Product[] = [];
 
+  isLoading = false;
   isSubmitting = false;
   errorMessage: string | null = null;
+  estimatedTotal = 0;
 
   orderForm: FormGroup;
+  private formSub?: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -50,8 +54,14 @@ export class AddOrder implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCustomers();
-    this.loadProducts();
+    this.loadLookupData();
+    this.formSub = this.orderForm.valueChanges.subscribe(() => {
+      this.recalculateTotal();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.formSub?.unsubscribe();
   }
 
   createItemGroup(): FormGroup {
@@ -63,34 +73,57 @@ export class AddOrder implements OnInit {
 
   addItem(): void {
     this.items.push(this.createItemGroup());
+    this.recalculateTotal();
   }
 
   removeItem(index: number): void {
     if (this.items.length > 1) {
       this.items.removeAt(index);
+      this.recalculateTotal();
     }
   }
 
-  loadCustomers(): void {
-    this.customerService.getCustomers().subscribe({
-      next: (response) => {
-        this.customers = response;
+  loadLookupData(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.orderForm.disable();
+
+    forkJoin({
+      customers: this.customerService.getCustomers(),
+      products: this.productService.getProducts(),
+    }).subscribe({
+      next: ({ customers, products }) => {
+        this.customers = customers;
+        this.products = products;
+        this.isLoading = false;
+        this.orderForm.enable();
+        this.recalculateTotal();
       },
       error: () => {
-        this.errorMessage = 'Failed to load customers.';
+        this.errorMessage = 'Failed to load customers and products.';
+        this.isLoading = false;
       },
     });
   }
 
-  loadProducts(): void {
-    this.productService.getProducts().subscribe({
-      next: (response) => {
-        this.products = response;
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load products.';
-      },
-    });
+  recalculateTotal(): void {
+    const items = this.orderForm.getRawValue().items as {
+      productId: string;
+      quantity: number;
+    }[];
+
+    this.estimatedTotal = items.reduce((total, item) => {
+      const product = this.products.find(
+        (p) => p.id === Number(item.productId)
+      );
+      const quantity = Number(item.quantity);
+
+      if (!product || !quantity) {
+        return total;
+      }
+
+      return total + product.price * quantity;
+    }, 0);
   }
 
   onSubmit(): void {
@@ -125,19 +158,5 @@ export class AddOrder implements OnInit {
         this.isSubmitting = false;
       },
     });
-  }
-    getEstimatedTotal(): number {
-    return this.items.controls.reduce((total, control) => {
-      const productId = Number(control.get('productId')?.value);
-      const quantity = Number(control.get('quantity')?.value);
-
-      const product = this.products.find(p => p.id === productId);
-
-      if (!product || !quantity) {
-        return total;
-      }
-
-      return total + product.price * quantity;
-    }, 0);
   }
 }

@@ -1,17 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateOrderRequest, OrderResponse } from '../models/order.model';
+import {
+  CreateOrderRequest,
+  OrderResponse,
+  OrderSummary,
+} from '../models/order.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5023/api/orders';
+  private readonly apiUrl = `${environment.apiUrl}/orders`;
 
-  getOrders(): Observable<OrderResponse[]> {
-    return this.http.get<OrderResponse[]>(this.apiUrl);
+  getOrders(): Observable<OrderSummary[]> {
+    return this.http.get<OrderSummary[]>(this.apiUrl);
   }
 
   getOrderById(id: number): Observable<OrderResponse> {

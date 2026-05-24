@@ -1,13 +1,20 @@
-<section class="add-product-page">
+<section class="page-container">
   <a class="back-link" routerLink="/products">← Back to products</a>
-  <h2>Add Product</h2>
 
-  <app-product-form
-    [productForm]="productForm"
-    [isSubmitting]="isSubmitting"
-    buttonText="Add Product"
-    (formSubmit)="onSubmit()">
-  </app-product-form>
+  <div class="page-header">
+    <div>
+      <h2>Add Product</h2>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <app-product-form
+      [productForm]="productForm"
+      [isSubmitting]="isSubmitting"
+      buttonText="Add Product"
+      (formSubmit)="onSubmit()"
+    ></app-product-form>
+  </div>
 
   @if (successMessage) {
     <p class="success-message">{{ successMessage }}</p>

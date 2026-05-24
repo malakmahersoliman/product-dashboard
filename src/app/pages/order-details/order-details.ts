@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { OrderResponse, ORDER_STATUS } from '../../models/order.model';
+import { OrderResponse, ORDER_STATUS, OrderStatus } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 
 @Component({
@@ -15,6 +15,7 @@ export class OrderDetails implements OnInit {
   isLoading = false;
   errorMessage = '';
   isUpdating = false;
+  ORDER_STATUS = ORDER_STATUS;
 
   constructor(
     private orderService: OrderService,
@@ -46,21 +47,21 @@ export class OrderDetails implements OnInit {
     });
   }
 
-  isCompleted(): boolean {
-    return this.order?.status === ORDER_STATUS.completed;
+  isPending(): boolean {
+    return this.order?.status === ORDER_STATUS.pending;
   }
 
-  onUpdateStatus(): void {
-    if (!this.order || this.isCompleted()) {
+  onUpdateStatus(status: OrderStatus): void {
+    if (!this.order || !this.isPending()) {
       return;
     }
 
     this.isUpdating = true;
     this.errorMessage = '';
 
-    this.orderService.updateOrderStatus(this.order.id, ORDER_STATUS.completed).subscribe({
+    this.orderService.updateOrderStatus(this.order.id, status).subscribe({
       next: () => {
-        this.order!.status = ORDER_STATUS.completed;
+        this.order!.status = status;
         this.isUpdating = false;
         this.cdr.markForCheck();
       },

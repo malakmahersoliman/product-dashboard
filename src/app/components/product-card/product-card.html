@@ -1,30 +1,62 @@
-<div class="product-card">
-  <div class="card-header">
-    <h3>{{ product.name }}</h3>
+<article class="product-card">
+  <div class="card-top">
+    <span class="category-tag">{{ product.category }}</span>
 
-    @if (product.isAvailable) {
-      <span class="badge available">Available</span>
+    @if (!product.isAvailable || product.stock === 0) {
+      <span class="badge unavailable">Out of stock</span>
+    } @else if (isLowStock) {
+      <span class="badge low-stock">Low stock</span>
     } @else {
-      <span class="badge unavailable">Out of Stock</span>
+      <span class="badge available">Available</span>
     }
   </div>
 
-  <p class="category">{{ product.category }}</p>
+  <h3>{{ product.name }}</h3>
 
-  <div class="info-row">
+  <div class="price-row">
     <span>Price</span>
-    <strong>{{ product.price }}</strong>
+    <strong>{{ product.price | currency }}</strong>
   </div>
 
-  <div class="info-row">
+  <div class="stock-row" [class.low]="isLowStock" [class.out]="product.stock === 0">
     <span>Stock</span>
-    <strong>{{ product.stock }}</strong>
+    <strong>{{ product.stock }} units</strong>
   </div>
+
+  @if (authService.isLoggedIn() && canAddToCart) {
+    @let cartQty = cartService.items().find(item => item.productId === product.id)?.quantity ?? 0;
+    <div class="qty-controls">
+      <span class="qty-label">Add to cart</span>
+      <div class="qty-buttons">
+        <button
+          type="button"
+          class="qty-btn"
+          (click)="onDecrease()"
+          [disabled]="cartQty === 0"
+        >
+          −
+        </button>
+        <span class="qty-value">{{ cartQty }}</span>
+        <button
+          type="button"
+          class="qty-btn"
+          (click)="onIncrease()"
+          [disabled]="cartQty >= product.stock"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  }
 
   <div class="actions">
-    <a class="details-btn" [routerLink]="['/products', product.id]">View</a>
-    <a class="edit-btn" [routerLink]="['/products', product.id, 'edit']">Edit</a>
-   <button class="delete-btn" (click)=
-   "onDeleteClick()">Delete</button> 
+    <a class="details-btn" [routerLink]="['/products', product.id]">View details</a>
+
+    @if (authService.isSuperAdmin()) {
+      <div class="admin-actions">
+        <a class="edit-btn" [routerLink]="['/products', product.id, 'edit']">Edit</a>
+        <button type="button" class="delete-btn" (click)="onDeleteClick()">Delete</button>
+      </div>
+    }
   </div>
-</div>
+</article>

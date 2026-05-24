@@ -1,35 +1,58 @@
-<section class="customers-page">
+<section class="customers-page page-container">
   <div class="page-header">
     <div>
       <h2>Customers</h2>
-      <p>Manage customer records used for orders.</p>
     </div>
 
-      <a class="primary-btn" routerLink="/customers/new">
-        Add Customer
-      </a>
+    @if (authService.isSuperAdmin()) {
+      <a class="primary-btn" routerLink="/customers/new">Add Customer</a>
+    }
   </div>
 
   @if (isLoading) {
-    <p class="state-message">Loading customers...</p>
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading customers...</span>
+    </div>
   } @else if (errorMessage) {
     <p class="error-message">{{ errorMessage }}</p>
   } @else if (customers.length === 0) {
-    <p class="state-message">No customers found.</p>
-  } @else {
-    <div class="customers-grid">
-      @for (customer of customers; track customer.id) {
-        <article class="customer-card">
-          <div class="avatar">
-            {{ customer.name.charAt(0).toUpperCase() }}
-          </div>
-
-          <div class="customer-info">
-            <h3>{{ customer.name }}</h3>
-            <p>{{ customer.email }}</p>
-          </div>
-        </article>
+    <div class="empty-state">
+      <p>No customers found yet.</p>
+      @if (authService.isSuperAdmin()) {
+        <a class="primary-btn" routerLink="/customers/new">Add Customer</a>
       }
     </div>
+  } @else {
+    <div class="toolbar">
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Search by name or email..."
+        [(ngModel)]="searchTerm"
+      />
+      <span class="result-count">
+        Showing {{ filteredCustomers.length }} of {{ customers.length }} customers
+      </span>
+    </div>
+
+    @if (filteredCustomers.length === 0) {
+      <p class="state-message">No customers match your search.</p>
+    } @else {
+      <div class="customers-grid">
+        @for (customer of filteredCustomers; track customer.id) {
+          <article class="customer-card">
+            <div class="avatar">
+              {{ customer.name.charAt(0).toUpperCase() }}
+            </div>
+
+            <div class="customer-info">
+              <h3>{{ customer.name }}</h3>
+              <p>{{ customer.email }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    }
   }
 </section>

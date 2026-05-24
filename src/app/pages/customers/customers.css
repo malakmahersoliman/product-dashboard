@@ -1,39 +1,7 @@
-.customers-page {
-  max-width: 1100px;
-  margin: 32px auto;
-  padding: 0 24px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-header h2 {
-  margin: 0;
-  font-size: 28px;
-}
-
-.page-header p {
-  margin: 6px 0 0;
-  color: #6b7280;
-}
-
-.primary-btn {
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: #111827;
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-}
-
 .customers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .customer-card {
@@ -41,42 +9,37 @@
   align-items: center;
   gap: 14px;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid #ddd6c8;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(44, 40, 37, 0.08);
 }
 
 .avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #111827;
+  background: #4a6280;
   color: white;
   display: grid;
   place-items: center;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .customer-info h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .customer-info p {
-  margin: 4px 0 0;
-  color: #6b7280;
+  margin: 3px 0 0;
+  color: #6f665c;
+  font-size: 14px;
+  word-break: break-word;
 }
 
-.state-message,
-.error-message {
-  padding: 14px;
-  border-radius: 10px;
-  background: #f9fafb;
-}
-
-.error-message {
-  color: #991b1b;
-  background: #fee2e2;
+.empty-state .primary-btn {
+  margin-top: 14px;
 }

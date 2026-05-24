@@ -1,11 +1,10 @@
-<section class="orders-page">
+<section class="orders-page page-container">
   <div class="page-header">
     <div>
       <h2>Orders</h2>
-      <p>View customer orders and their items.</p>
     </div>
 
-    <a class="primary-btn" routerLink="/orders/new">Add Order</a>
+    <a class="primary-btn" routerLink="/cart">Create Order</a>
   </div>
 
   @if (errorMessage && !isLoading && orders.length > 0) {
@@ -13,14 +12,35 @@
   }
 
   @if (isLoading) {
-    <p class="state-message">Loading orders...</p>
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading orders...</span>
+    </div>
   } @else if (errorMessage && orders.length === 0) {
     <p class="error-message">{{ errorMessage }}</p>
   } @else if (orders.length === 0) {
-    <p class="state-message">No orders found.</p>
+    <div class="empty-state">
+      <p>No orders yet. Create your first order to get started.</p>
+      <a class="primary-btn" routerLink="/cart">Create Order</a>
+    </div>
   } @else {
-    <div class="orders-table-wrapper">
-      <table class="orders-table">
+    <div class="toolbar">
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Search by order #, customer, or status..."
+        [(ngModel)]="searchTerm"
+      />
+      <span class="result-count">
+        Showing {{ filteredOrders.length }} of {{ orders.length }} orders
+      </span>
+    </div>
+
+    @if (filteredOrders.length === 0) {
+      <p class="state-message">No orders match your search.</p>
+    } @else {
+    <div class="data-table-wrapper">
+      <table class="data-table orders-table">
         <thead>
           <tr>
             <th>Order</th>
@@ -29,18 +49,15 @@
             <th>Total</th>
             <th>Items</th>
             <th>Date</th>
-            <th>Products</th>
             <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          @for (order of orders; track order.id) {
+          @for (order of filteredOrders; track order.id) {
             <tr>
-              <td>#{{ order.id }}</td>
-
+              <td><strong>#{{ order.id }}</strong></td>
               <td>{{ order.customerName }}</td>
-
               <td>
                 <span
                   class="status-badge"
@@ -51,35 +68,19 @@
                   {{ order.status }}
                 </span>
               </td>
-
               <td>{{ order.totalAmount | currency }}</td>
-
-              <td>{{ order.items.length }}</td>
-
+              <td>{{ order.itemCount }}</td>
               <td>{{ order.orderDate | date: 'mediumDate' }}</td>
-
-              <td>
-                <div class="order-products">
-                  @for (item of order.items; track item.id) {
-                    <div class="order-product-line">
-                      <span>{{ item.productName }}</span>
-                      <small>
-                        Qty: {{ item.quantity }} · Unit: {{ item.unitPrice | currency }} · Subtotal:
-                        {{ item.subtotal | currency }}
-                      </small>
-                    </div>
-                  }
-                </div>
-              </td>
-
               <td>
                 <div class="table-actions">
-                  <a class="view-btn" [routerLink]="['/orders', order.id]">View</a>
+                  <a class="secondary-btn" [routerLink]="['/orders', order.id]">View</a>
 
-                  @if (order.status === ORDER_STATUS.pending) {
+                  @if (isPending(order)) {
                     <button
                       type="button"
+                      class="btn-primary"
                       (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)"
+                      [disabled]="updatingOrderId === order.id"
                     >
                       Complete
                     </button>
@@ -88,11 +89,10 @@
                       type="button"
                       class="cancel-btn"
                       (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)"
+                      [disabled]="updatingOrderId === order.id"
                     >
                       Cancel
                     </button>
-                  } @else {
-                    <span class="completed-label">{{ order.status }}</span>
                   }
 
                   <button
@@ -109,5 +109,6 @@
         </tbody>
       </table>
     </div>
+    }
   }
 </section>

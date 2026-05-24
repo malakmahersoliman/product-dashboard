@@ -75,7 +75,15 @@ export class EditProduct implements OnInit {
     this.successMessage = null;
     this.errorMessage = null;
 
-    this.productService.updateProduct(this.productId, this.productForm.value).subscribe({
+    const formValue = this.productForm.getRawValue();
+
+    this.productService
+      .updateProduct(this.productId, {
+        ...formValue,
+        price: Number(formValue.price),
+        stock: Number(formValue.stock),
+      })
+      .subscribe({
       next: () => {
         this.successMessage = 'Product updated successfully.';
         this.router.navigate(['/products']);

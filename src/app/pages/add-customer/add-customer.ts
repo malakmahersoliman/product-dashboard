@@ -7,7 +7,6 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-add-customer',
   imports: [ReactiveFormsModule,RouterLink],
-  providers: [CustomerService],
   templateUrl: './add-customer.html',
   styleUrl: './add-customer.css',
 })
@@ -39,6 +38,7 @@ export class AddCustomer {
       next: (response) => {
         this.isSubmitting = false;
         this.customerForm.reset();
+        this.customerService.clearCache();
         this.router.navigate(['/customers']);
 
       },

@@ -3,26 +3,30 @@ import { HttpClient } from '@angular/common/http';
 import {
   Product,
   CreateProductRequest,
-  UpdateProductRequest
+  UpdateProductRequest,
 } from '../models/product.model';
-import { Observable } from 'rxjs';
-
-
-
-
-
+import { Observable, shareReplay, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
-
-
-
 export class ProductService {
-    private http = inject(HttpClient);
-    private readonly apiUrl = 'http://localhost:5023/api/products';
+  private http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/products`;
+  private productsCache$?: Observable<Product[]>;
+
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    if (!this.productsCache$) {
+      this.productsCache$ = this.http
+        .get<Product[]>(this.apiUrl)
+        .pipe(shareReplay(1));
+    }
+    return this.productsCache$;
+  }
+
+  clearCache(): void {
+    this.productsCache$ = undefined;
   }
 
   getProductById(id: number): Observable<Product> {
@@ -34,7 +38,9 @@ export class ProductService {
   }
 
   updateProduct(id: number, productData: UpdateProductRequest): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, productData);
+    return this.http
+      .put<void>(`${this.apiUrl}/${id}`, productData)
+      .pipe(tap(() => this.clearCache()));
   }
 
   deleteProduct(id: number): Observable<void> {

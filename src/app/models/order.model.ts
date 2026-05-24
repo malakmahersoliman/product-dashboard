@@ -6,6 +6,16 @@ export const ORDER_STATUS = {
 
 export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
 
+export interface OrderSummary {
+  id: number;
+  orderDate: string;
+  status: string;
+  totalAmount: number;
+  customerId: number;
+  customerName: string;
+  itemCount: number;
+}
+
 export interface OrderItemResponse {
   id: number;
   productId: number;

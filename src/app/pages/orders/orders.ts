@@ -1,17 +1,19 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ORDER_STATUS, OrderResponse, OrderStatus } from '../../models/order.model';
+import { FormsModule } from '@angular/forms';
+import { ORDER_STATUS, OrderStatus, OrderSummary } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
 export class Orders implements OnInit {
-  orders: OrderResponse[] = [];
+  orders: OrderSummary[] = [];
+  searchTerm = '';
   isLoading = false;
   ORDER_STATUS = ORDER_STATUS;
   errorMessage: string | null = null;
@@ -26,10 +28,24 @@ export class Orders implements OnInit {
     this.loadOrders();
   }
 
+  get filteredOrders(): OrderSummary[] {
+    const term = this.searchTerm.trim().toLowerCase();
+
+    if (!term) {
+      return this.orders;
+    }
+
+    return this.orders.filter(
+      (order) =>
+        order.customerName.toLowerCase().includes(term) ||
+        order.status.toLowerCase().includes(term) ||
+        order.id.toString().includes(term)
+    );
+  }
+
   loadOrders(): void {
     this.isLoading = true;
     this.errorMessage = null;
-    
 
     this.orderService.getOrders().subscribe({
       next: (response) => {
@@ -45,8 +61,8 @@ export class Orders implements OnInit {
     });
   }
 
-  isCompleted(order: OrderResponse): boolean {
-    return order.status === ORDER_STATUS.completed;
+  isPending(order: OrderSummary): boolean {
+    return order.status === ORDER_STATUS.pending;
   }
 
   onUpdateStatus(id: number, status: OrderStatus): void {
@@ -57,7 +73,7 @@ export class Orders implements OnInit {
       next: () => {
         const order = this.orders.find((o) => o.id === id);
         if (order) {
-          order.status = ORDER_STATUS.completed;
+          order.status = status;
         }
         this.updatingOrderId = null;
         this.cdr.markForCheck();

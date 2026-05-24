@@ -1,50 +1,13 @@
-form {
-  display: grid;
-  gap: 18px;
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-}
-
-label {
+:host {
   display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-small {
-  display: block;
-  margin-top: 5px;
-  color: #dc2626;
-}
-
-button {
-  padding: 12px 16px;
-  border: none;
-  border-radius: 10px;
-  background: #222;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .checkbox-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
 .checkbox-row input {

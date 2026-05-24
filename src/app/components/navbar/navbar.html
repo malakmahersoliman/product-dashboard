@@ -1,16 +1,55 @@
 <nav class="navbar">
   <div class="brand">Store Dashboard</div>
 
-  <div class="links">
-    @if (authService.isLoggedIn()) {
-      <a routerLink="/products" routerLinkActive="active">Products</a>
-      <a routerLink="/customers" routerLinkActive="active">Customers</a>
-      <a routerLink="/orders" routerLinkActive="active">Orders</a>
-      <a routerLink="/about" routerLinkActive="active">About</a>
+  @if (authService.isLoggedIn()) {
+    <div class="nav-right">
+      <div class="nav-links">
+        <a routerLink="/products" routerLinkActive="active">Products</a>
+        <a routerLink="/customers" routerLinkActive="active">Customers</a>
 
-      <button type="button" class="logout-btn" (click)="logout()">
-        Logout
-      </button>
-    }
-  </div>
+        @if (authService.isSuperAdmin()) {
+          <a routerLink="/orders" routerLinkActive="active">Orders</a>
+        }
+      </div>
+
+      <div class="nav-actions">
+        <div class="user-meta">
+          <span class="user-email">{{ authService.getEmail() }}</span>
+          <span class="role-badge" [class.admin]="authService.isSuperAdmin()">
+            {{ authService.isSuperAdmin() ? 'Admin' : 'User' }}
+          </span>
+        </div>
+
+        <button type="button" class="logout-btn" (click)="logout()">
+          Logout
+        </button>
+
+        <a
+          class="cart-link"
+          routerLink="/cart"
+          routerLinkActive="active"
+          aria-label="Open cart"
+          [attr.title]="'Cart (' + cartService.itemCount() + ' items)'"
+        >
+          <span class="cart-icon-wrap">
+            <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M6 6h15l-1.5 9h-12L6 6zm0 0L5 3H2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="9" cy="20" r="1.4" fill="currentColor" />
+              <circle cx="18" cy="20" r="1.4" fill="currentColor" />
+            </svg>
+            @if (cartService.itemCount() > 0) {
+              <span class="cart-badge">{{ cartService.itemCount() }}</span>
+            }
+          </span>
+        </a>
+      </div>
+    </div>
+  }
 </nav>

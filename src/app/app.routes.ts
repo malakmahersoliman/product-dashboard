@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard-guard';
-
+import { RoleGuard } from './guards/role.guard-guard';
 export const routes: Routes = [
     {
      path:'',
@@ -21,13 +21,13 @@ export const routes: Routes = [
    },
    {
     path:'products/new',
-    canActivate:[AuthGuard],
+    canActivate:[AuthGuard,RoleGuard],
     loadComponent: () => 
         import('./pages/add-product/add-product').then(m => m.AddProduct)
    },
    {
     path: 'products/:id/edit',
-    canActivate:[AuthGuard],
+    canActivate:[AuthGuard,RoleGuard],
     loadComponent: () =>
         import('./pages/edit-product/edit-product').then(m => m.EditProduct)
    },
@@ -45,25 +45,30 @@ export const routes: Routes = [
    },
    {
     path: 'customers/new',
-    canActivate:[AuthGuard],
+    canActivate: [AuthGuard, RoleGuard],
     loadComponent: () =>
         import('./pages/add-customer/add-customer').then(m => m.AddCustomer)
    },
-     {
+   {
+    path: 'cart',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+        import('./pages/cart/cart').then(m => m.Cart)
+   },
+   {
     path: 'orders/new',
-    canActivate:[AuthGuard],
-    loadComponent: ()=> 
-        import('./pages/add-order/add-order').then(m => m.AddOrder)
+    redirectTo: 'cart',
+    pathMatch: 'full',
    },
    {
     path: 'orders/:id',
-    canActivate:[AuthGuard],
+    canActivate:[AuthGuard,RoleGuard],
     loadComponent: () =>
         import('./pages/order-details/order-details').then(m => m.OrderDetails)
    },
    {
     path: 'orders',
-    canActivate:[AuthGuard],
+    canActivate:[AuthGuard, RoleGuard],
     loadComponent: ()=>
         import('./pages/orders/orders').then(m=> m.Orders)
    },

@@ -40,9 +40,9 @@ export class AddProduct {
 
     this.productService.createProduct(this.productForm.value).subscribe({
       next: (response) => {
-      //this.successMessage = `Product "${response.name}" added successfully.`;
         this.isSubmitting = false;
         this.productForm.reset({ isAvailable: true });
+        this.productService.clearCache();
         this.router.navigate(['/products']);
 
       },

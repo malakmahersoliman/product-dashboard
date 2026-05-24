@@ -1,53 +1,12 @@
-.add-product-page {
-  max-width: 700px;
-  margin: 32px auto;
-  padding: 24px;
+section.page-container {
+  max-width: 720px;
 }
 
-form {
-  display: grid;
-  gap: 18px;
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+.form-card {
+  margin-bottom: 16px;
 }
 
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-textarea {
-  min-height: 100px;
-}
-
-small {
-  display: block;
-  margin-top: 5px;
-  color: #dc2626;
-}
-
-button {
-  padding: 12px 16px;
-  border: none;
-  border-radius: 10px;
-  background: #222;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.success-message,
+.error-message {
+  margin-top: 16px;
 }

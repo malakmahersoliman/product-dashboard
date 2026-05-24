@@ -1,0 +1,27 @@
+.about-page {
+  max-width: 720px;
+}
+
+.about-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.about-item {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #faf8f4;
+  border: 1px solid #ddd6c8;
+}
+
+.about-item strong {
+  font-size: 15px;
+}
+
+.about-item span {
+  color: #6f665c;
+  font-size: 15px;
+  line-height: 1.55;
+}

@@ -1,17 +1,15 @@
 import { Component , OnInit , ChangeDetectorRef} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-
 @Component({
   selector: 'app-product-details',
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css',
 })
-
-
 export class ProductDetails implements OnInit {
   product: Product | null = null;
   isLoading = false;
@@ -28,6 +26,10 @@ export class ProductDetails implements OnInit {
     this.loadProduct(id);
   }
 
+  get isLowStock(): boolean {
+    return !!this.product && this.product.stock > 0 && this.product.stock < 5;
+  }
+
   loadProduct(id: number): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -37,7 +39,6 @@ export class ProductDetails implements OnInit {
         this.product = response;
         this.isLoading = false;
         this.cdr.markForCheck();
-  
       },
       error: () => {
         this.errorMessage = 'Failed to load product. Please try again later.';

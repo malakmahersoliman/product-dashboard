@@ -1,35 +1,34 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { LoginRequest, LoginResponse } from '../models/auth.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private http = inject(HttpClient);
+
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
   private readonly tokenKey = 'auth_token';
   private readonly emailKey = 'auth_email';
+  private readonly roleKey = 'auth_role';
 
   login(request: LoginRequest): Observable<LoginResponse> {
-    if (request.email === 'admin@test.com' && request.password === '123456') {
-      return of({
-        token: 'mock-jwt-token',
-        email: request.email,
-        role: 'Admin'
-      }).pipe(delay(500));
-    }
-
-    return throwError(() => new Error('Invalid email or password'));
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request);
   }
 
   saveSession(response: LoginResponse): void {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.emailKey, response.email);
+    localStorage.setItem(this.roleKey, response.role);
   }
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.emailKey);
+    localStorage.removeItem(this.roleKey);
   }
 
   getToken(): string | null {
@@ -40,7 +39,15 @@ export class AuthService {
     return localStorage.getItem(this.emailKey);
   }
 
+  getRole(): string | null {
+    return localStorage.getItem(this.roleKey);
+  }
+
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  isSuperAdmin(): boolean {
+    return this.getRole() === 'SuperAdmin';
   }
 }
