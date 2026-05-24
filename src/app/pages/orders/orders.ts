@@ -5,6 +5,8 @@ import { ORDER_STATUS, OrderStatus, OrderSummary } from '../../models/order.mode
 import { OrderService } from '../../services/order.service';
 import { RouterLink } from '@angular/router';
 
+type StatusFilter = 'All' | OrderStatus;
+
 @Component({
   selector: 'app-orders',
   imports: [RouterLink, CommonModule, FormsModule],
@@ -14,14 +16,22 @@ import { RouterLink } from '@angular/router';
 export class Orders implements OnInit {
   orders: OrderSummary[] = [];
   searchTerm = '';
+  statusFilter: StatusFilter = 'All';
   isLoading = false;
   ORDER_STATUS = ORDER_STATUS;
   errorMessage: string | null = null;
   updatingOrderId: number | null = null;
 
+  readonly statusFilters: StatusFilter[] = [
+    'All',
+    ORDER_STATUS.pending,
+    ORDER_STATUS.completed,
+    ORDER_STATUS.cancelled,
+  ];
+
   constructor(
     private orderService: OrderService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -31,16 +41,39 @@ export class Orders implements OnInit {
   get filteredOrders(): OrderSummary[] {
     const term = this.searchTerm.trim().toLowerCase();
 
-    if (!term) {
-      return this.orders;
-    }
+    return this.orders.filter((order) => {
+      const matchesStatus =
+        this.statusFilter === 'All' || order.status === this.statusFilter;
 
-    return this.orders.filter(
-      (order) =>
+      if (!matchesStatus) {
+        return false;
+      }
+
+      if (!term) {
+        return true;
+      }
+
+      return (
         order.customerName.toLowerCase().includes(term) ||
-        order.status.toLowerCase().includes(term) ||
         order.id.toString().includes(term)
-    );
+      );
+    });
+  }
+
+  get totalOrdersCount(): number {
+    return this.orders.length;
+  }
+
+  get pendingCount(): number {
+    return this.orders.filter((o) => o.status === ORDER_STATUS.pending).length;
+  }
+
+  get completedCount(): number {
+    return this.orders.filter((o) => o.status === ORDER_STATUS.completed).length;
+  }
+
+  get cancelledCount(): number {
+    return this.orders.filter((o) => o.status === ORDER_STATUS.cancelled).length;
   }
 
   loadOrders(): void {
@@ -61,8 +94,45 @@ export class Orders implements OnInit {
     });
   }
 
-  isPending(order: OrderSummary): boolean {
+  setStatusFilter(filter: StatusFilter): void {
+    this.statusFilter = filter;
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case ORDER_STATUS.completed:
+        return 'status-completed';
+      case ORDER_STATUS.cancelled:
+        return 'status-cancelled';
+      default:
+        return 'status-pending';
+    }
+  }
+
+  canComplete(order: OrderSummary): boolean {
     return order.status === ORDER_STATUS.pending;
+  }
+
+  canCancel(order: OrderSummary): boolean {
+    return order.status === ORDER_STATUS.pending;
+  }
+
+  orderTotal(order: OrderSummary): number {
+    return order.totalAmount;
+  }
+
+  itemCount(order: OrderSummary): number {
+    return order.itemCount;
+  }
+
+  formatDate(dateString: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(dateString));
   }
 
   onUpdateStatus(id: number, status: OrderStatus): void {

@@ -2,6 +2,7 @@
   <div class="page-header">
     <div>
       <h2>Orders</h2>
+      <p class="page-subtitle">View and manage customer orders</p>
     </div>
 
     <a class="primary-btn" routerLink="/cart">Create Order</a>
@@ -20,95 +21,132 @@
     <p class="error-message">{{ errorMessage }}</p>
   } @else if (orders.length === 0) {
     <div class="empty-state">
-      <p>No orders yet. Create your first order to get started.</p>
+      <h3>No orders yet</h3>
+      <p>Create your first order from the cart to get started.</p>
       <a class="primary-btn" routerLink="/cart">Create Order</a>
     </div>
   } @else {
-    <div class="toolbar">
+    <div class="orders-summary">
+      <article class="summary-card">
+        <span class="summary-label">Total Orders</span>
+        <strong class="summary-value">{{ totalOrdersCount }}</strong>
+      </article>
+      <article class="summary-card summary-card--warning">
+        <span class="summary-label">Pending</span>
+        <strong class="summary-value">{{ pendingCount }}</strong>
+      </article>
+      <article class="summary-card summary-card--success">
+        <span class="summary-label">Completed</span>
+        <strong class="summary-value">{{ completedCount }}</strong>
+      </article>
+      <article class="summary-card summary-card--danger">
+        <span class="summary-label">Cancelled</span>
+        <strong class="summary-value">{{ cancelledCount }}</strong>
+      </article>
+    </div>
+
+    <div class="orders-toolbar">
       <input
         type="search"
         class="search-input"
-        placeholder="Search by order #, customer, or status..."
+        placeholder="Search by order # or customer name..."
         [(ngModel)]="searchTerm"
       />
-      <span class="result-count">
-        Showing {{ filteredOrders.length }} of {{ orders.length }} orders
-      </span>
+
+      <div class="status-filters" role="group" aria-label="Filter by status">
+        @for (filter of statusFilters; track filter) {
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="statusFilter === filter"
+            (click)="setStatusFilter(filter)"
+          >
+            {{ filter }}
+          </button>
+        }
+      </div>
     </div>
+
+    <p class="result-count">
+      Showing {{ filteredOrders.length }} of {{ orders.length }} orders
+    </p>
 
     @if (filteredOrders.length === 0) {
-      <p class="state-message">No orders match your search.</p>
+      <div class="empty-state empty-filter">
+        <p>No orders match your search or filter.</p>
+      </div>
     } @else {
-    <div class="data-table-wrapper">
-      <table class="data-table orders-table">
-        <thead>
-          <tr>
-            <th>Order</th>
-            <th>Customer</th>
-            <th>Status</th>
-            <th>Total</th>
-            <th>Items</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div class="orders-table-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table orders-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Items</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          @for (order of filteredOrders; track order.id) {
-            <tr>
-              <td><strong>#{{ order.id }}</strong></td>
-              <td>{{ order.customerName }}</td>
-              <td>
-                <span
-                  class="status-badge"
-                  [class.status-completed]="order.status === ORDER_STATUS.completed"
-                  [class.status-pending]="order.status === ORDER_STATUS.pending"
-                  [class.status-cancelled]="order.status === ORDER_STATUS.cancelled"
-                >
-                  {{ order.status }}
-                </span>
-              </td>
-              <td>{{ order.totalAmount | currency }}</td>
-              <td>{{ order.itemCount }}</td>
-              <td>{{ order.orderDate | date: 'mediumDate' }}</td>
-              <td>
-                <div class="table-actions">
-                  <a class="secondary-btn" [routerLink]="['/orders', order.id]">View</a>
+            <tbody>
+              @for (order of filteredOrders; track order.id) {
+                <tr>
+                  <td><strong class="order-id">#{{ order.id }}</strong></td>
+                  <td>{{ order.customerName }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td class="amount-cell">{{ orderTotal(order) | currency }}</td>
+                  <td>{{ itemCount(order) }}</td>
+                  <td class="date-cell">{{ formatDate(order.orderDate) }}</td>
+                  <td>
+                    <div class="table-actions">
+                      <a class="action-btn action-btn--view" [routerLink]="['/orders', order.id]">
+                        View Details
+                      </a>
 
-                  @if (isPending(order)) {
-                    <button
-                      type="button"
-                      class="btn-primary"
-                      (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)"
-                      [disabled]="updatingOrderId === order.id"
-                    >
-                      Complete
-                    </button>
+                      @if (canComplete(order)) {
+                        <button
+                          type="button"
+                          class="action-btn action-btn--complete"
+                          (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)"
+                          [disabled]="updatingOrderId === order.id"
+                        >
+                          Mark Completed
+                        </button>
+                      }
 
-                    <button
-                      type="button"
-                      class="cancel-btn"
-                      (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)"
-                      [disabled]="updatingOrderId === order.id"
-                    >
-                      Cancel
-                    </button>
-                  }
+                      @if (canCancel(order)) {
+                        <button
+                          type="button"
+                          class="action-btn action-btn--cancel"
+                          (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)"
+                          [disabled]="updatingOrderId === order.id"
+                        >
+                          Cancel
+                        </button>
+                      }
 
-                  <button
-                    type="button"
-                    class="delete-btn"
-                    (click)="onDeleteOrder(order.id)"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+                      <button
+                        type="button"
+                        class="action-btn action-btn--delete"
+                        (click)="onDeleteOrder(order.id)"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
     }
   }
 </section>

@@ -1,7 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { OrderResponse, ORDER_STATUS, OrderStatus } from '../../models/order.model';
+import {
+  OrderResponse,
+  OrderItemResponse,
+  ORDER_STATUS,
+  OrderStatus,
+} from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 
 @Component({
@@ -21,7 +26,7 @@ export class OrderDetails implements OnInit {
     private orderService: OrderService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -47,12 +52,49 @@ export class OrderDetails implements OnInit {
     });
   }
 
-  isPending(): boolean {
+  getStatusClass(status: string): string {
+    switch (status) {
+      case ORDER_STATUS.completed:
+        return 'status-completed';
+      case ORDER_STATUS.cancelled:
+        return 'status-cancelled';
+      default:
+        return 'status-pending';
+    }
+  }
+
+  canComplete(): boolean {
     return this.order?.status === ORDER_STATUS.pending;
   }
 
+  canCancel(): boolean {
+    return this.order?.status === ORDER_STATUS.pending;
+  }
+
+  itemCount(): number {
+    return this.order?.items.length ?? 0;
+  }
+
+  orderTotal(): number {
+    return this.order?.totalAmount ?? 0;
+  }
+
+  lineTotal(item: OrderItemResponse): number {
+    return item.subtotal;
+  }
+
+  formatDate(dateString: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(dateString));
+  }
+
   onUpdateStatus(status: OrderStatus): void {
-    if (!this.order || !this.isPending()) {
+    if (!this.order || !this.canComplete()) {
       return;
     }
 
