@@ -73,11 +73,6 @@ export const routes: Routes = [
         import('./pages/orders/orders').then(m=> m.Orders)
    },
    {
-    path:'about',
-    loadComponent: () => 
-        import('./pages/about/about').then(m=>m.About)
-   },
-   {
     path:'**',
     loadComponent: () => 
         import('./pages/not-found/not-found').then(m => m.NotFound)
