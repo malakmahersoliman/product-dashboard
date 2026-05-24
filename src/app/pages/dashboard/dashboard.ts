@@ -1,31 +1,67 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DashboardData } from '../../models/dashboard.model';
-import { ORDER_STATUS } from '../../models/order.model';
-import { MOCK_DASHBOARD_DATA } from './dashboard.mock';
+import { RouterLink } from '@angular/router';
+import { StatisticsResponse } from '../../models/statistics.model';
+import { StatisticsService } from '../../services/statistics.service';
+
+interface OverviewBar {
+  label: string;
+  value: number;
+  count: number;
+}
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  dashboardData: DashboardData | null = null;
+  private statisticsService = inject(StatisticsService);
+  private cdr = inject(ChangeDetectorRef);
 
-  readonly salesBars = [
-    { label: 'Mon', value: 62 },
-    { label: 'Tue', value: 78 },
-    { label: 'Wed', value: 55 },
-    { label: 'Thu', value: 88 },
-    { label: 'Fri', value: 72 },
-    { label: 'Sat', value: 95 },
-    { label: 'Sun', value: 68 },
-  ];
+  statistics: StatisticsResponse | null = null;
+  isLoading = false;
+  errorMessage: string | null = null;
 
   ngOnInit(): void {
-    // Mock load — replace with DashboardService.getDashboardData() later
-    this.dashboardData = MOCK_DASHBOARD_DATA;
+    this.loadStatistics();
+  }
+
+  loadStatistics(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.cdr.markForCheck();
+
+    this.statisticsService.getStatistics().subscribe({
+      next: (response) => {
+        this.statistics = response;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.errorMessage = 'Unable to load statistics. Please try again.';
+        this.statistics = null;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  get orderOverviewBars(): OverviewBar[] {
+    if (!this.statistics) {
+      return [];
+    }
+
+    const { pending, completed, cancelled, total } = this.statistics.orders;
+    const max = Math.max(pending, completed, cancelled, total, 1);
+
+    return [
+      { label: 'Pending', value: (pending / max) * 100, count: pending },
+      { label: 'Completed', value: (completed / max) * 100, count: completed },
+      { label: 'Cancelled', value: (cancelled / max) * 100, count: cancelled },
+      { label: 'Total', value: (total / max) * 100, count: total },
+    ];
   }
 
   formatCurrency(amount: number): string {
@@ -33,26 +69,5 @@ export class Dashboard implements OnInit {
       style: 'currency',
       currency: 'USD',
     }).format(amount);
-  }
-
-  formatDate(dateString: string): string {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(new Date(dateString));
-  }
-
-  getStatusClass(status: string): string {
-    switch (status) {
-      case ORDER_STATUS.completed:
-        return 'status-completed';
-      case ORDER_STATUS.cancelled:
-        return 'status-cancelled';
-      default:
-        return 'status-pending';
-    }
   }
 }

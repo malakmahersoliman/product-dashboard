@@ -6,36 +6,46 @@
     </div>
   </div>
 
-  @if (dashboardData; as data) {
+  @if (isLoading) {
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading statistics...</span>
+    </div>
+  } @else if (errorMessage) {
+    <div class="error-card">
+      <p class="error-message">{{ errorMessage }}</p>
+      <button type="button" class="primary-btn" (click)="loadStatistics()">Try Again</button>
+    </div>
+  } @else if (statistics; as stats) {
     <div class="stats-grid">
       <article class="stat-card">
         <span class="stat-label">Total Products</span>
-        <strong class="stat-value">{{ data.stats.totalProducts }}</strong>
+        <strong class="stat-value">{{ stats.products.total | number }}</strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-label">Total Customers</span>
-        <strong class="stat-value">{{ data.stats.totalCustomers }}</strong>
+        <strong class="stat-value">{{ stats.customers.total | number }}</strong>
       </article>
 
       <article class="stat-card">
         <span class="stat-label">Total Orders</span>
-        <strong class="stat-value">{{ data.stats.totalOrders }}</strong>
+        <strong class="stat-value">{{ stats.orders.total | number }}</strong>
       </article>
 
       <article class="stat-card stat-card--sales">
         <span class="stat-label">Today's Sales</span>
-        <strong class="stat-value">{{ formatCurrency(data.stats.todaysSales) }}</strong>
+        <strong class="stat-value">{{ formatCurrency(stats.orders.todaySales) }}</strong>
       </article>
 
       <article class="stat-card stat-card--warning">
         <span class="stat-label">Pending Orders</span>
-        <strong class="stat-value">{{ data.stats.pendingOrders }}</strong>
+        <strong class="stat-value">{{ stats.orders.pending | number }}</strong>
       </article>
 
       <article class="stat-card stat-card--danger">
         <span class="stat-label">Low Stock Products</span>
-        <strong class="stat-value">{{ data.stats.lowStockProducts }}</strong>
+        <strong class="stat-value">{{ stats.products.lowStock | number }}</strong>
       </article>
     </div>
 
@@ -44,34 +54,9 @@
         <div class="panel-header">
           <h3>Recent Orders</h3>
         </div>
-
-        <div class="data-table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Order #</th>
-                <th>Customer</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (order of data.recentOrders; track order.id) {
-                <tr>
-                  <td>#{{ order.id }}</td>
-                  <td>{{ order.customerName }}</td>
-                  <td>
-                    <span class="status-badge" [ngClass]="getStatusClass(order.status)">
-                      {{ order.status }}
-                    </span>
-                  </td>
-                  <td>{{ formatCurrency(order.totalAmount) }}</td>
-                  <td>{{ formatDate(order.orderDate) }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <div class="panel-empty">
+          <p>Recent order details are not included in the statistics endpoint.</p>
+          <a class="secondary-btn" routerLink="/orders">View All Orders</a>
         </div>
       </section>
 
@@ -79,36 +64,12 @@
         <div class="panel-header">
           <h3>Low Stock Products</h3>
         </div>
-
-        <div class="data-table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Stock</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (product of data.lowStockProducts; track product.name) {
-                <tr>
-                  <td>{{ product.name }}</td>
-                  <td>
-                    <span [class.stock-critical]="product.stock <= 3">
-                      {{ product.stock }}
-                    </span>
-                  </td>
-                  <td>
-                    @if (product.isAvailable) {
-                      <span class="badge badge-available">Available</span>
-                    } @else {
-                      <span class="badge badge-unavailable">Unavailable</span>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <div class="panel-empty">
+          <p>
+            <strong>{{ stats.products.lowStock | number }}</strong> products are low on stock.
+            <strong>{{ stats.products.outOfStock | number }}</strong> are out of stock.
+          </p>
+          <a class="secondary-btn" routerLink="/products">View Products</a>
         </div>
       </section>
     </div>
@@ -116,13 +77,14 @@
     <section class="dashboard-panel sales-panel">
       <div class="panel-header">
         <h3>Sales Overview</h3>
-        <span class="panel-subtitle">Last 7 days (mock data)</span>
+        <span class="panel-subtitle">Order breakdown (live data)</span>
       </div>
 
       <div class="sales-placeholder">
         <div class="sales-bars">
-          @for (bar of salesBars; track bar.label) {
+          @for (bar of orderOverviewBars; track bar.label) {
             <div class="sales-bar-col">
+              <span class="sales-bar-count">{{ bar.count | number }}</span>
               <div class="sales-bar-track">
                 <div class="sales-bar-fill" [style.height.%]="bar.value"></div>
               </div>
@@ -130,7 +92,9 @@
             </div>
           }
         </div>
-        <p class="sales-note">Chart placeholder — connect a DashboardService for live data</p>
+        <p class="sales-note">
+          Today's sales: {{ formatCurrency(stats.orders.todaySales) }}
+        </p>
       </div>
     </section>
   }
