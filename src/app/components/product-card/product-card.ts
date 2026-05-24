@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '../../models/product.model';
 import { RouterLink } from '@angular/router';
@@ -19,25 +19,75 @@ export class ProductCard {
   cartService = inject(CartService);
   private cdr = inject(ChangeDetectorRef);
 
-  get isLowStock(): boolean {
-    return this.product.stock > 0 && this.product.stock < 5;
+  constructor() {
+    effect(() => {
+      this.cartService.items();
+      this.cdr.markForCheck();
+    });
   }
 
-  get canAddToCart(): boolean {
-    return (this.product.isAvailable ?? true) && this.product.stock > 0;
+  cartQty(productId: number): number {
+    return this.cartService.getQuantity(productId);
   }
 
-  onIncrease(): void {
-    this.cartService.increase(this.product);
+  isOutOfStock(product: Product): boolean {
+    return product.stock === 0 || product.isAvailable === false;
+  }
+
+  isLowStock(product: Product): boolean {
+    return product.stock > 0 && product.stock < 5;
+  }
+
+  isMaxStockReached(product: Product): boolean {
+    return product.stock > 0 && this.cartQty(product.id) >= product.stock;
+  }
+
+  canIncrement(product: Product): boolean {
+    return !this.isOutOfStock(product) && this.cartQty(product.id) < product.stock;
+  }
+
+  canAddToCart(product: Product): boolean {
+    return this.canIncrement(product);
+  }
+
+  incrementQty(product: Product): void {
+    this.cartService.increase(product);
     this.cdr.markForCheck();
   }
 
-  onDecrease(): void {
-    this.cartService.decrease(this.product.id);
+  decrementQty(product: Product): void {
+    this.cartService.decrease(product.id);
     this.cdr.markForCheck();
+  }
+
+  onAddToCart(): void {
+    if (this.canAddToCart(this.product)) {
+      this.cartService.increase(this.product);
+      this.cdr.markForCheck();
+    }
   }
 
   onDeleteClick(): void {
     this.deleteProduct.emit(this.product.id);
+  }
+
+  statusBadgeClass(product: Product): string {
+    if (this.isOutOfStock(product)) {
+      return 'badge-unavailable';
+    }
+    if (this.isLowStock(product)) {
+      return 'badge-low-stock';
+    }
+    return 'badge-available';
+  }
+
+  statusLabel(product: Product): string {
+    if (this.isOutOfStock(product)) {
+      return 'Out of Stock';
+    }
+    if (this.isLowStock(product)) {
+      return 'Low Stock';
+    }
+    return 'Available';
   }
 }

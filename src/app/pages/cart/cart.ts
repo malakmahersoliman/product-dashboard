@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -26,6 +26,7 @@ export class Cart implements OnInit {
   private orderService = inject(OrderService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+
   customers: Customer[] = [];
   isLoadingCustomers = false;
   isSubmitting = false;
@@ -35,8 +36,43 @@ export class Cart implements OnInit {
     customerId: ['', Validators.required],
   });
 
+  constructor() {
+    effect(() => {
+      this.cartService.items();
+      this.cartService.total();
+      this.cdr.markForCheck();
+    });
+  }
+
   ngOnInit(): void {
     this.loadCustomers();
+  }
+
+  get subtotal(): number {
+    return this.cartService.total();
+  }
+
+  get canPlaceOrder(): boolean {
+    if (
+      this.isSubmitting ||
+      this.isLoadingCustomers ||
+      this.cartService.items().length === 0 ||
+      this.checkoutForm.invalid
+    ) {
+      return false;
+    }
+
+    return this.cartService.items().every(
+      (item) => item.quantity > 0 && item.quantity <= item.stock
+    );
+  }
+
+  get selectedCustomerName(): string | null {
+    const customerId = Number(this.checkoutForm.value.customerId);
+    if (!customerId) {
+      return null;
+    }
+    return this.customers.find((c) => c.id === customerId)?.name ?? null;
   }
 
   loadCustomers(): void {
@@ -69,10 +105,24 @@ export class Cart implements OnInit {
     this.cdr.markForCheck();
   }
 
+  onClearCart(): void {
+    this.cartService.clear();
+    this.errorMessage = null;
+    this.cdr.markForCheck();
+  }
+
+  canIncreaseInCart(item: { quantity: number; stock: number }): boolean {
+    return item.quantity < item.stock;
+  }
+
+  lineTotal(price: number, quantity: number): number {
+    return price * quantity;
+  }
+
   onPlaceOrder(): void {
     this.checkoutForm.markAllAsTouched();
 
-    if (this.checkoutForm.invalid || this.cartService.items().length === 0) {
+    if (!this.canPlaceOrder) {
       return;
     }
 

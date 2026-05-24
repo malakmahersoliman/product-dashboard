@@ -1,56 +1,81 @@
-<article class="product-card">
+<article class="product-card" [class.product-card--out]="isOutOfStock(product)">
   <div class="card-top">
-    <span class="category-tag">{{ product.category }}</span>
-
-    @if (!product.isAvailable || product.stock === 0) {
-      <span class="badge unavailable">Out of stock</span>
-    } @else if (isLowStock) {
-      <span class="badge low-stock">Low stock</span>
+    @if (product.category) {
+      <span class="category-tag">{{ product.category }}</span>
     } @else {
-      <span class="badge available">Available</span>
+      <span class="category-tag category-tag--muted">Uncategorized</span>
     }
+
+    <span class="badge" [ngClass]="statusBadgeClass(product)">
+      {{ statusLabel(product) }}
+    </span>
   </div>
 
-  <h3>{{ product.name }}</h3>
+  <h3 class="product-name">{{ product.name }}</h3>
 
-  <div class="price-row">
-    <span>Price</span>
-    <strong>{{ product.price | currency }}</strong>
+  <div class="product-meta">
+    <div class="meta-row">
+      <span class="meta-label">Price</span>
+      <strong class="meta-value meta-value--price">{{ product.price | currency }}</strong>
+    </div>
+
+    <div class="meta-row">
+      <span class="meta-label">Stock</span>
+      <strong
+        class="meta-value"
+        [class.meta-value--low]="isLowStock(product)"
+        [class.meta-value--out]="isOutOfStock(product)"
+      >
+        {{ product.stock }} units
+      </strong>
+    </div>
   </div>
 
-  <div class="stock-row" [class.low]="isLowStock" [class.out]="product.stock === 0">
-    <span>Stock</span>
-    <strong>{{ product.stock }} units</strong>
-  </div>
+  @if (authService.isLoggedIn()) {
+    <div class="pos-controls">
+      <span class="pos-controls-label">Quantity</span>
 
-  @if (authService.isLoggedIn() && canAddToCart) {
-    @let cartQty = cartService.items().find(item => item.productId === product.id)?.quantity ?? 0;
-    <div class="qty-controls">
-      <span class="qty-label">Add to cart</span>
-      <div class="qty-buttons">
+      <div class="qty-controls">
         <button
           type="button"
           class="qty-btn"
-          (click)="onDecrease()"
-          [disabled]="cartQty === 0"
+          aria-label="Decrease quantity"
+          (click)="decrementQty(product)"
+          [disabled]="cartQty(product.id) === 0"
         >
           −
         </button>
-        <span class="qty-value">{{ cartQty }}</span>
+        <span class="qty-value">{{ cartQty(product.id) }}</span>
         <button
           type="button"
           class="qty-btn"
-          (click)="onIncrease()"
-          [disabled]="cartQty >= product.stock"
+          aria-label="Increase quantity"
+          (click)="incrementQty(product)"
+          [disabled]="!canIncrement(product)"
         >
           +
         </button>
       </div>
+
+      @if (isOutOfStock(product)) {
+        <p class="stock-hint stock-hint--danger">Currently unavailable</p>
+      } @else if (isMaxStockReached(product)) {
+        <p class="stock-hint stock-hint--warning">Max stock reached</p>
+      }
+
+      <button
+        type="button"
+        class="add-to-cart-btn"
+        (click)="onAddToCart()"
+        [disabled]="!canAddToCart(product)"
+      >
+        Add to Cart
+      </button>
     </div>
   }
 
-  <div class="actions">
-    <a class="details-btn" [routerLink]="['/products', product.id]">View details</a>
+  <div class="card-footer">
+    <a class="details-link" [routerLink]="['/products', product.id]">View details</a>
 
     @if (authService.isSuperAdmin()) {
       <div class="admin-actions">

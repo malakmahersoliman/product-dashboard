@@ -3,76 +3,102 @@
 
   <div class="page-header">
     <div>
-      <h2>Cart</h2>
-      <p class="page-subtitle">Review your items, select a customer, and place your order.</p>
+      <h2>New Order</h2>
+      <p class="page-subtitle">Review cart items, select a customer, and create the order</p>
     </div>
   </div>
 
+  @if (errorMessage) {
+    <p class="error-message cart-error">{{ errorMessage }}</p>
+  }
+
   @if (cartService.items().length === 0) {
-    <div class="empty-state">
-      <p>Your cart is empty.</p>
-      <a class="primary-btn" routerLink="/products">Browse products</a>
+    <div class="empty-state empty-cart">
+      <div class="empty-cart-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M6 6h15l-1.5 9h-12L6 6zm0 0L5 3H2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle cx="9" cy="20" r="1.4" fill="currentColor" />
+          <circle cx="18" cy="20" r="1.4" fill="currentColor" />
+        </svg>
+      </div>
+      <h3>No items in cart</h3>
+      <p>Add products from the inventory to start a new order.</p>
+      <a class="primary-btn" routerLink="/products">Browse Products</a>
     </div>
   } @else {
     <div class="cart-layout">
-      <div class="cart-items">
-        @for (item of cartService.items(); track item.productId) {
-          <article class="cart-item">
-            <div class="cart-item-info">
-              <h3>{{ item.name }}</h3>
-              <p>{{ item.price | currency }} each</p>
-            </div>
+      <div class="cart-main">
+        <div class="cart-panel">
+          <div class="panel-heading">
+            <h3>Order Items</h3>
+            <span class="item-count">{{ cartService.itemCount() }} items</span>
+          </div>
 
-            <div class="qty-controls">
-              <button
-                type="button"
-                class="qty-btn"
-                (click)="onDecreaseInCart(item.productId)"
-              >
-                −
-              </button>
-              <span class="qty-value">{{ item.quantity }}</span>
-              <button
-                type="button"
-                class="qty-btn"
-                [disabled]="item.quantity >= item.stock"
-                (click)="onIncreaseInCart(item.productId)"
-              >
-                +
-              </button>
-            </div>
+          <div class="cart-items">
+            @for (item of cartService.items(); track item.productId) {
+              <article class="cart-item">
+                <div class="cart-item-info">
+                  <h4>{{ item.name }}</h4>
+                  <p class="unit-price">{{ item.price | currency }} each</p>
+                </div>
 
-            <strong class="line-total">
-              {{ item.price * item.quantity | currency }}
-            </strong>
+                <div class="cart-item-qty">
+                  <span class="qty-label">Qty</span>
+                  <div class="qty-controls">
+                    <button
+                      type="button"
+                      class="qty-btn"
+                      aria-label="Decrease quantity"
+                      (click)="onDecreaseInCart(item.productId)"
+                    >
+                      −
+                    </button>
+                    <span class="qty-value">{{ item.quantity }}</span>
+                    <button
+                      type="button"
+                      class="qty-btn"
+                      aria-label="Increase quantity"
+                      [disabled]="!canIncreaseInCart(item)"
+                      (click)="onIncreaseInCart(item.productId)"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
 
-            <button
-              type="button"
-              class="remove-btn"
-              (click)="onRemoveFromCart(item.productId)"
-            >
-              Remove
-            </button>
-          </article>
-        }
+                <div class="cart-item-total">
+                  <span class="total-label">Line total</span>
+                  <strong>{{ lineTotal(item.price, item.quantity) | currency }}</strong>
+                </div>
+
+                <button
+                  type="button"
+                  class="remove-btn"
+                  (click)="onRemoveFromCart(item.productId)"
+                >
+                  Remove
+                </button>
+              </article>
+            }
+          </div>
+        </div>
       </div>
 
-      <aside class="checkout-card">
-        <h3>Checkout</h3>
-
-        <div class="order-summary">
-          <span>Items</span>
-          <strong>{{ cartService.itemCount() }}</strong>
+      <aside class="checkout-panel">
+        <div class="panel-heading">
+          <h3>Checkout</h3>
         </div>
 
-        <div class="order-summary">
-          <span>Total</span>
-          <strong>{{ cartService.total() | currency }}</strong>
-        </div>
-
-        <form [formGroup]="checkoutForm" (ngSubmit)="onPlaceOrder()">
-          <div>
-            <label for="customerId">Customer</label>
+        <div class="customer-section">
+          <label for="customerId">Customer</label>
+          <form [formGroup]="checkoutForm" (ngSubmit)="onPlaceOrder()">
             <select id="customerId" formControlName="customerId">
               <option value="">Select customer</option>
 
@@ -85,23 +111,51 @@
               checkoutForm.get('customerId')?.touched &&
               checkoutForm.get('customerId')?.invalid
             ) {
-              <small>Please select a customer.</small>
+              <small class="field-error">Please select a customer.</small>
             }
-          </div>
 
-          <button type="submit" [disabled]="isSubmitting || isLoadingCustomers">
-            @if (isSubmitting) {
-              Placing order...
-            } @else {
-              Place Order
+            @if (selectedCustomerName) {
+              <div class="selected-customer">
+                <span class="selected-label">Selected</span>
+                <strong>{{ selectedCustomerName }}</strong>
+              </div>
             }
-          </button>
-        </form>
+
+            <div class="order-summary">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>{{ subtotal | currency }}</strong>
+              </div>
+              <div class="summary-row summary-row--total">
+                <span>Estimated Total</span>
+                <strong>{{ subtotal | currency }}</strong>
+              </div>
+              <p class="summary-note">{{ cartService.itemCount() }} items in this order</p>
+            </div>
+
+            <button
+              type="submit"
+              class="create-order-btn"
+              [disabled]="!canPlaceOrder"
+            >
+              @if (isSubmitting) {
+                Creating order...
+              } @else {
+                Create Order
+              }
+            </button>
+
+            <button
+              type="button"
+              class="clear-cart-btn"
+              [disabled]="isSubmitting"
+              (click)="onClearCart()"
+            >
+              Clear Cart
+            </button>
+          </form>
+        </div>
       </aside>
     </div>
-  }
-
-  @if (errorMessage) {
-    <p class="error-message">{{ errorMessage }}</p>
   }
 </section>

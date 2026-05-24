@@ -108,9 +108,9 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px 24px;
-  background: var(--color-surface);
+  background: var(--color-topbar-bg);
   border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .topbar-left {
@@ -127,11 +127,12 @@
   width: 38px;
   height: 38px;
   padding: 0;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-btn-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-btn-surface);
   color: var(--color-text);
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
 
 .menu-toggle svg {
@@ -140,7 +141,7 @@
 }
 
 .menu-toggle:hover {
-  background: var(--color-bg);
+  background: var(--color-btn-surface-hover);
 }
 
 .topbar-title {
@@ -189,19 +190,21 @@
 }
 
 .logout-btn {
-  background: var(--color-surface);
+  background: var(--color-btn-surface);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-btn-border);
   padding: 8px 14px;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .logout-btn:hover {
-  background: var(--color-bg);
+  background: var(--color-btn-surface-hover);
+  border-color: #64748b;
 }
 
 .cart-link {
@@ -210,15 +213,17 @@
   justify-content: center;
   padding: 8px 10px;
   border-radius: var(--radius-md);
-  color: var(--color-text);
+  color: var(--color-primary);
   text-decoration: none;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  transition: background 0.15s ease;
+  border: 1px solid #a5b4fc;
+  background: var(--color-primary-soft);
+  transition: background 0.15s ease, border-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .cart-link:hover {
-  background: var(--color-bg);
+  background: #e0e7ff;
+  border-color: var(--color-primary);
 }
 
 .cart-link.active {
