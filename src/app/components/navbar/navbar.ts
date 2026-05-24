@@ -59,8 +59,7 @@ export class Navbar implements OnInit, OnDestroy {
 
   private updateShellVisibility(): void {
     const leafPath = this.getLeafRoutePath();
-    const isPublicRoute =
-      leafPath === 'login' || leafPath === 'about' || leafPath === '**';
+    const isPublicRoute = leafPath === 'login' || leafPath === '**';
 
     this.showShell = this.authService.isLoggedIn() && !isPublicRoute;
     this.cdr.markForCheck();

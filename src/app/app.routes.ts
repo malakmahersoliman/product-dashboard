@@ -73,6 +73,12 @@ export const routes: Routes = [
         import('./pages/orders/orders').then(m=> m.Orders)
    },
    {
+    path: 'dashboard',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+      import('./pages/dashboard/dashboard').then(m => m.Dashboard),
+   },
+   {
     path:'**',
     loadComponent: () => 
         import('./pages/not-found/not-found').then(m => m.NotFound)

@@ -1,0 +1,137 @@
+<section class="dashboard-page page-container">
+  <div class="page-header">
+    <div>
+      <h2>Dashboard</h2>
+      <p>Store overview and key metrics</p>
+    </div>
+  </div>
+
+  @if (dashboardData; as data) {
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Total Products</span>
+        <strong class="stat-value">{{ data.stats.totalProducts }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Total Customers</span>
+        <strong class="stat-value">{{ data.stats.totalCustomers }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Total Orders</span>
+        <strong class="stat-value">{{ data.stats.totalOrders }}</strong>
+      </article>
+
+      <article class="stat-card stat-card--sales">
+        <span class="stat-label">Today's Sales</span>
+        <strong class="stat-value">{{ formatCurrency(data.stats.todaysSales) }}</strong>
+      </article>
+
+      <article class="stat-card stat-card--warning">
+        <span class="stat-label">Pending Orders</span>
+        <strong class="stat-value">{{ data.stats.pendingOrders }}</strong>
+      </article>
+
+      <article class="stat-card stat-card--danger">
+        <span class="stat-label">Low Stock Products</span>
+        <strong class="stat-value">{{ data.stats.lowStockProducts }}</strong>
+      </article>
+    </div>
+
+    <div class="dashboard-sections">
+      <section class="dashboard-panel">
+        <div class="panel-header">
+          <h3>Recent Orders</h3>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of data.recentOrders; track order.id) {
+                <tr>
+                  <td>#{{ order.id }}</td>
+                  <td>{{ order.customerName }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td>{{ formatCurrency(order.totalAmount) }}</td>
+                  <td>{{ formatDate(order.orderDate) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard-panel">
+        <div class="panel-header">
+          <h3>Low Stock Products</h3>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Stock</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of data.lowStockProducts; track product.name) {
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>
+                    <span [class.stock-critical]="product.stock <= 3">
+                      {{ product.stock }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (product.isAvailable) {
+                      <span class="badge badge-available">Available</span>
+                    } @else {
+                      <span class="badge badge-unavailable">Unavailable</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="dashboard-panel sales-panel">
+      <div class="panel-header">
+        <h3>Sales Overview</h3>
+        <span class="panel-subtitle">Last 7 days (mock data)</span>
+      </div>
+
+      <div class="sales-placeholder">
+        <div class="sales-bars">
+          @for (bar of salesBars; track bar.label) {
+            <div class="sales-bar-col">
+              <div class="sales-bar-track">
+                <div class="sales-bar-fill" [style.height.%]="bar.value"></div>
+              </div>
+              <span class="sales-bar-label">{{ bar.label }}</span>
+            </div>
+          }
+        </div>
+        <p class="sales-note">Chart placeholder — connect a DashboardService for live data</p>
+      </div>
+    </section>
+  }
+</section>

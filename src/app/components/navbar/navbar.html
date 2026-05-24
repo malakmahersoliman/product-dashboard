@@ -14,6 +14,22 @@
       </div>
 
       <nav class="sidebar-nav" aria-label="Main navigation">
+        @if (authService.isSuperAdmin()) {
+          <a routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebar()">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 4h7v7H4V4zm10 0h6v4h-6V4zM4 13h7v7H4v-7zm10 3h6v7h-6v-7z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Dashboard
+          </a>
+        }
+
         <a routerLink="/products" routerLinkActive="active" (click)="closeSidebar()">
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
