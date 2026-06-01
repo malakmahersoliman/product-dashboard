@@ -79,6 +79,12 @@ export const routes: Routes = [
       import('./pages/dashboard/dashboard').then(m => m.Dashboard),
    },
    {
+    path: 'categories',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+        import('./pages/categories/categories').then(m => m.Categories),
+    },
+   {
     path:'**',
     loadComponent: () => 
         import('./pages/not-found/not-found').then(m => m.NotFound)

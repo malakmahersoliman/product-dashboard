@@ -1,0 +1,186 @@
+<section class="categories-page page-container">
+  <div class="page-header">
+    <div>
+      <h2>Categories</h2>
+      <p class="page-subtitle">Organize products into clear catalog groups.</p>
+    </div>
+
+    <button type="button" class="primary-btn" (click)="cancelEdit()">
+      Add Category
+    </button>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="success-message">{{ successMessage }}</p>
+  }
+
+  @if (isLoading) {
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading categories...</span>
+    </div>
+  } @else {
+    <div class="categories-summary">
+      <article class="summary-card">
+        <span class="summary-label">Total Categories</span>
+        <strong class="summary-value">{{ totalCategories }}</strong>
+      </article>
+
+      <article class="summary-card summary-card--info">
+        <span class="summary-label">Catalog Setup</span>
+        <strong class="summary-value">Ready</strong>
+        <p class="summary-hint">Next step: connect products to categories.</p>
+      </article>
+    </div>
+
+    <div class="categories-grid">
+      <article class="category-form-card">
+        <div class="card-header">
+          <div>
+            <h3>{{ isEditing ? 'Edit Category' : 'Add Category' }}</h3>
+            <p>
+              {{
+                isEditing
+                  ? 'Update this catalog group.'
+                  : 'Create a catalog group for your products.'
+              }}
+            </p>
+          </div>
+        </div>
+
+        <form class="category-form" (ngSubmit)="onSubmit()">
+          <label class="form-field">
+            <span>Name</span>
+            <input
+              type="text"
+              name="name"
+              placeholder="Example: Electronics"
+              [(ngModel)]="form.name"
+              [disabled]="isSaving"
+              required
+            />
+          </label>
+
+          <label class="form-field">
+            <span>Description</span>
+            <textarea
+              name="description"
+              rows="4"
+              placeholder="Optional short description..."
+              [(ngModel)]="form.description"
+              [disabled]="isSaving"
+            ></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit" class="primary-btn" [disabled]="isSaving">
+              {{
+                isSaving
+                  ? 'Saving...'
+                  : isEditing
+                    ? 'Update Category'
+                    : 'Save Category'
+              }}
+            </button>
+
+            @if (isEditing) {
+              <button
+                type="button"
+                class="secondary-btn"
+                (click)="cancelEdit()"
+                [disabled]="isSaving"
+              >
+                Cancel
+              </button>
+            }
+          </div>
+        </form>
+      </article>
+
+      <article class="categories-list-panel">
+        <div class="list-header">
+          <div>
+            <h3>Category List</h3>
+            <p>Manage catalog groups used by the store.</p>
+          </div>
+        </div>
+
+        <div class="categories-toolbar">
+          <input
+            type="search"
+            class="search-input"
+            placeholder="Search by name or description..."
+            [(ngModel)]="searchTerm"
+          />
+        </div>
+
+        <p class="result-count">
+          Showing {{ filteredCategories.length }} of {{ categories.length }} categories
+        </p>
+
+        @if (categories.length === 0) {
+          <div class="empty-state">
+            <h3>No categories yet</h3>
+            <p>Create your first category to start organizing products.</p>
+          </div>
+        } @else if (filteredCategories.length === 0) {
+          <div class="empty-state empty-filter">
+            <p>No categories match your search.</p>
+          </div>
+        } @else {
+          <div class="categories-table-panel">
+            <div class="data-table-wrapper">
+              <table class="data-table categories-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @for (category of filteredCategories; track category.id) {
+                    <tr>
+                      <td>
+                        <strong class="category-name">{{ category.name }}</strong>
+                      </td>
+
+                      <td class="description-cell">
+                        {{ category.description || 'No description' }}
+                      </td>
+
+                      <td>
+                        <div class="table-actions">
+                          <button
+                            type="button"
+                            class="action-btn action-btn--edit"
+                            (click)="startEdit(category)"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            class="action-btn action-btn--delete"
+                            (click)="onDelete(category)"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </article>
+    </div>
+  }
+</section>
