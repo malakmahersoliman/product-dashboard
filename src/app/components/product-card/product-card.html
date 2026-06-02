@@ -1,8 +1,9 @@
 <article class="product-card" [class.product-card--out]="isOutOfStock(product)">
   <div class="card-top">
-    @if (product.category) {
-      <span class="category-tag">{{ product.category }}</span>
-    } @else {
+    @if (product.categoryName) {
+      <span class="category-tag">{{ product.categoryName }}</span>
+    }
+     @else {
       <span class="category-tag category-tag--muted">Uncategorized</span>
     }
 

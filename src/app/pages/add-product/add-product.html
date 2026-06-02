@@ -8,12 +8,15 @@
   </div>
 
   <div class="form-card">
-    <app-product-form
-      [productForm]="productForm"
-      [isSubmitting]="isSubmitting"
-      buttonText="Add Product"
-      (formSubmit)="onSubmit()"
-    ></app-product-form>
+  <app-product-form
+    [productForm]="productForm"
+    [isSubmitting]="isSubmitting"
+    [categories]="categories"
+    [categoriesLoading]="categoriesLoading"
+    [categoriesError]="categoriesError"
+    buttonText="Create Product"
+    (formSubmit)="onSubmit()"
+  />
   </div>
 
   @if (successMessage) {

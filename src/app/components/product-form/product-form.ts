@@ -1,5 +1,6 @@
-import { Component , Input, Output, EventEmitter} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-product-form',
@@ -9,12 +10,19 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 })
 export class ProductForm {
   @Input() productForm!: FormGroup;
-  @Input() isSubmitting: boolean = false;
-  @Input() buttonText: string = 'Submit';
+  @Input() isSubmitting = false;
+  @Input() buttonText = 'Submit';
+  
+
+  //after adding categories we define it here 
+  // so now we make it a dropdown to choice from it 
+  @Input() categories: Category[] = [];
+  @Input() categoriesLoading = false;
+  @Input() categoriesError = '';
 
   @Output() formSubmit = new EventEmitter<void>();
 
-  onSubmit() {
+  onSubmit(): void {
     this.formSubmit.emit();
   }
 }

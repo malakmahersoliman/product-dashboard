@@ -56,7 +56,7 @@ export class Products implements OnInit {
     return this.products.filter(
       (product) =>
         product.name.toLowerCase().includes(term) ||
-        product.category.toLowerCase().includes(term)
+        product.categoryId
     );
   }
 

@@ -7,7 +7,6 @@
       <p>Update product details and availability.</p>
     </div>
   </div>
-
   @if (isLoading) {
     <div class="loading-block">
       <span class="spinner"></span>
@@ -18,6 +17,9 @@
       <app-product-form
         [productForm]="productForm"
         [isSubmitting]="isSubmitting"
+        [categories]="categories"
+        [categoriesLoading]="categoriesLoading"
+        [categoriesError]="categoriesError"
         buttonText="Update Product"
         (formSubmit)="onSubmit()"
       ></app-product-form>
@@ -28,3 +30,4 @@
     <p class="error-message">{{ errorMessage }}</p>
   }
 </section>
+

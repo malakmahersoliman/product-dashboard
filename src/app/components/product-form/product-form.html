@@ -8,14 +8,34 @@
     }
   </div>
 
-  <div>
-    <label>Category</label>
-    <input type="text" formControlName="category" />
+<div>
+  <label>Category</label>
 
-    @if (productForm.get('category')?.touched && productForm.get('category')?.invalid) {
-      <small>Category is required and must be at most 100 characters.</small>
+  <select formControlName="categoryId" [disabled]="categoriesLoading">
+    <option [ngValue]="null" disabled>
+      @if (categoriesLoading) {
+        Loading categories...
+      } @else {
+        Select category
+      }
+    </option>
+
+    @for (category of categories; track category.id) {
+      <option [ngValue]="category.id">
+        <!-- Because plain HTML value often becomes a string -->
+        {{ category.name }}
+      </option>
     }
-  </div>
+  </select>
+
+  @if (categoriesError) {
+    <small>{{ categoriesError }}</small>
+  }
+
+  @if (productForm.get('categoryId')?.touched && productForm.get('categoryId')?.invalid) {
+    <small>Category is required.</small>
+  }
+</div>
 
   <div>
     <label>Price</label>
