@@ -30,6 +30,10 @@ export class ProductCard {
     return this.cartService.getQuantity(productId);
   }
 
+  hasInCart(productId: number): boolean {
+    return this.cartQty(productId) > 0;
+  }
+
   isOutOfStock(product: Product): boolean {
     return product.stock === 0 || product.isAvailable === false;
   }

@@ -31,9 +31,13 @@
     </div>
   </div>
 
-  @if (authService.isLoggedIn()) {
-    <div class="pos-controls">
-      <span class="pos-controls-label">Quantity</span>
+@if (authService.isLoggedIn()) {
+  <div class="pos-controls">
+    @if (hasInCart(product.id)) {
+      <div class="qty-header">
+        <span class="pos-controls-label">Quantity in cart</span>
+        <span class="in-cart-badge">In cart</span>
+      </div>
 
       <div class="qty-controls">
         <button
@@ -45,7 +49,9 @@
         >
           −
         </button>
+
         <span class="qty-value">{{ cartQty(product.id) }}</span>
+
         <button
           type="button"
           class="qty-btn"
@@ -57,10 +63,14 @@
         </button>
       </div>
 
+      @if (isMaxStockReached(product)) {
+        <p class="stock-hint stock-hint--warning">Max stock reached</p>
+      }
+    } @else {
       @if (isOutOfStock(product)) {
         <p class="stock-hint stock-hint--danger">Currently unavailable</p>
-      } @else if (isMaxStockReached(product)) {
-        <p class="stock-hint stock-hint--warning">Max stock reached</p>
+      } @else {
+        <p class="stock-hint">Ready to add to cart</p>
       }
 
       <button
@@ -71,8 +81,9 @@
       >
         Add to Cart
       </button>
-    </div>
-  }
+    }
+  </div>
+}
 
   <div class="card-footer">
     <a class="details-link" [routerLink]="['/products', product.id]">View details</a>
