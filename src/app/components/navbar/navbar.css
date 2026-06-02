@@ -7,7 +7,6 @@
   background: var(--color-bg);
 }
 
-/* Sidebar */
 .sidebar {
   position: fixed;
   top: 0;
@@ -85,7 +84,6 @@
   display: none;
 }
 
-/* Main column */
 .main-column {
   flex: 1;
   min-width: 0;
@@ -98,7 +96,6 @@
   margin-left: var(--sidebar-width);
 }
 
-/* Topbar */
 .topbar {
   position: sticky;
   top: 0;
@@ -178,15 +175,15 @@
 .role-badge {
   padding: 4px 9px;
   border-radius: 999px;
-  background: #eef2ff;
+  background: var(--color-primary-soft);
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 700;
 }
 
 .role-badge.admin {
-  background: #fef3c7;
-  color: #b45309;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 
 .logout-btn {
@@ -222,8 +219,9 @@
 }
 
 .cart-link:hover {
-  background: #e0e7ff;
+  background: var(--color-primary-soft);
   border-color: var(--color-primary);
+  filter: brightness(0.97);
 }
 
 .cart-link.active {
@@ -269,7 +267,6 @@
   border-color: var(--color-primary);
 }
 
-/* Main content */
 .main-content {
   flex: 1;
 }
@@ -278,7 +275,6 @@
   background: var(--color-bg);
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   .with-shell .main-column {
     margin-left: 0;

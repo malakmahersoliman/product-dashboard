@@ -1,32 +1,52 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   Product,
   CreateProductRequest,
   UpdateProductRequest,
+  ProductFilterParams,
 } from '../models/product.model';
-import { Observable, shareReplay, tap } from 'rxjs';
+import { PagedResult } from '../models/common.model';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/products`;
-  private productsCache$?: Observable<Product[]>;
 
-  getProducts(): Observable<Product[]> {
-    if (!this.productsCache$) {
-      this.productsCache$ = this.http
-        .get<Product[]>(this.apiUrl)
-        .pipe(shareReplay(1));
+  getProducts(filters: ProductFilterParams): Observable<PagedResult<Product>> {
+    let params = new HttpParams()
+      .set('pageNumber', filters.pageNumber)
+      .set('pageSize', filters.pageSize);
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
     }
-    return this.productsCache$;
-  }
 
-  clearCache(): void {
-    this.productsCache$ = undefined;
+    if (filters.categoryId !== null && filters.categoryId !== undefined) {
+      params = params.set('categoryId', filters.categoryId);
+    }
+
+    if (filters.isAvailable !== null && filters.isAvailable !== undefined) {
+      params = params.set('isAvailable', filters.isAvailable);
+    }
+
+    if (filters.stockStatus) {
+      params = params.set('stockStatus', filters.stockStatus);
+    }
+
+    if (filters.sortBy) {
+      params = params.set('sortBy', filters.sortBy);
+    }
+
+    if (filters.sortDirection) {
+      params = params.set('sortDirection', filters.sortDirection);
+    }
+
+    return this.http.get<PagedResult<Product>>(this.apiUrl, { params });
   }
 
   getProductById(id: number): Observable<Product> {
@@ -38,9 +58,7 @@ export class ProductService {
   }
 
   updateProduct(id: number, productData: UpdateProductRequest): Observable<void> {
-    return this.http
-      .put<void>(`${this.apiUrl}/${id}`, productData)
-      .pipe(tap(() => this.clearCache()));
+    return this.http.put<void>(`${this.apiUrl}/${id}`, productData);
   }
 
   deleteProduct(id: number): Observable<void> {

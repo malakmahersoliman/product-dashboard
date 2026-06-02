@@ -95,7 +95,6 @@ export class AddProduct implements OnInit {
           isAvailable: true,
         });
 
-        this.productService.clearCache();
         this.router.navigate(['/products']);
         this.cdr.markForCheck();
       },

@@ -1,17 +1,7 @@
-.page-subtitle {
-  margin: 6px 0 0;
-  color: var(--color-muted);
-  font-size: 15px;
-}
-
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
-}
-
-.empty-state .primary-btn {
-  margin-top: 16px;
 }
 
 .toolbar {

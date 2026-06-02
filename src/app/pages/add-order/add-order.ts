@@ -90,11 +90,11 @@ export class AddOrder implements OnInit, OnDestroy {
 
     forkJoin({
       customers: this.customerService.getCustomers(),
-      products: this.productService.getProducts(),
+      products: this.productService.getProducts({ pageNumber: 1, pageSize: 500 }),
     }).subscribe({
       next: ({ customers, products }) => {
         this.customers = customers;
-        this.products = products;
+        this.products = products.items;
         this.isLoading = false;
         this.orderForm.enable();
         this.recalculateTotal();

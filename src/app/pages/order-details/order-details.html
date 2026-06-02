@@ -114,7 +114,7 @@
             @if (canComplete()) {
               <button
                 type="button"
-                class="action-btn action-btn--complete"
+                class="action-btn action-btn--block action-btn--complete"
                 (click)="onUpdateStatus(ORDER_STATUS.completed)"
                 [disabled]="isUpdating"
               >
@@ -129,7 +129,7 @@
             @if (canCancel()) {
               <button
                 type="button"
-                class="action-btn action-btn--cancel"
+                class="action-btn action-btn--block action-btn--cancel"
                 (click)="onUpdateStatus(ORDER_STATUS.cancelled)"
                 [disabled]="isUpdating"
               >
@@ -137,7 +137,7 @@
               </button>
             }
 
-            <button type="button" class="action-btn action-btn--delete" (click)="onDeleteOrder()">
+            <button type="button" class="action-btn action-btn--block action-btn--delete" (click)="onDeleteOrder()">
               Delete Order
             </button>
           </div>

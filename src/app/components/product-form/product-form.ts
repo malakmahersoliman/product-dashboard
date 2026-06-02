@@ -12,10 +12,6 @@ export class ProductForm {
   @Input() productForm!: FormGroup;
   @Input() isSubmitting = false;
   @Input() buttonText = 'Submit';
-  
-
-  //after adding categories we define it here 
-  // so now we make it a dropdown to choice from it 
   @Input() categories: Category[] = [];
   @Input() categoriesLoading = false;
   @Input() categoriesError = '';

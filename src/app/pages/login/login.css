@@ -8,24 +8,16 @@
 .login-card {
   width: 100%;
   max-width: 400px;
-  background: white;
-  border: 1px solid #ddd6c8;
-  border-radius: 14px;
   padding: 28px;
-  box-shadow: 0 4px 12px rgba(44, 40, 37, 0.08);
 }
 
 .login-brand h2 {
   margin: 0 0 6px;
   font-size: 24px;
-  font-weight: 700;
-  color: #2c2825;
 }
 
 .login-brand p {
   margin: 0 0 22px;
-  color: #6f665c;
-  font-size: 15px;
 }
 
 .login-card .error-message {
@@ -35,16 +27,15 @@
 .demo-credentials {
   margin-top: 18px;
   padding: 12px 14px;
-  border-radius: 10px;
-  background: #faf8f4;
-  border: 1px solid #ddd6c8;
-  color: #5c534a;
+  border-radius: var(--radius-md);
+  background: var(--color-inset);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
   display: grid;
   gap: 4px;
   font-size: 14px;
 }
 
 .demo-credentials strong {
-  color: #2c2825;
-  font-size: 14px;
+  color: var(--color-text);
 }

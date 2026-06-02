@@ -5,13 +5,8 @@
 .not-found-page .empty-state h2 {
   margin: 0;
   font-size: 42px;
-  color: #2c2825;
 }
 
 .not-found-page .empty-state p {
   margin: 10px 0 0;
-}
-
-.not-found-page .primary-btn {
-  margin-top: 16px;
 }

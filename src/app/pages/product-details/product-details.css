@@ -15,16 +15,6 @@
   font-size: 24px;
 }
 
-.category-tag {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: #f0ebe2;
-  color: #5c534a;
-  font-size: 13px;
-  font-weight: 600;
-}
-
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -33,19 +23,18 @@
 
 .summary-item {
   padding: 14px;
-  border-radius: 10px;
-  background: #faf8f4;
-  border: 1px solid #ddd6c8;
+  border-radius: var(--radius-md);
+  background: var(--color-inset);
+  border: 1px solid var(--color-border);
 }
 
 .summary-item.highlight {
-  background: #eef2f6;
-  border-color: #9eb3c9;
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-border);
 }
 
 .summary-item span {
   display: block;
-  color: #6f665c;
   font-size: 13px;
   margin-bottom: 4px;
 }

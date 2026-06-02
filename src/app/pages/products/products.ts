@@ -56,7 +56,7 @@ export class Products implements OnInit {
     return this.products.filter(
       (product) =>
         product.name.toLowerCase().includes(term) ||
-        product.categoryId
+        product.categoryName.toLowerCase().includes(term)
     );
   }
 
@@ -64,9 +64,11 @@ export class Products implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.productService.getProducts().subscribe({
+    this.productService
+      .getProducts({ pageNumber: 1, pageSize: 500 })
+      .subscribe({
       next: (response) => {
-        this.products = response;
+        this.products = response.items;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
@@ -90,7 +92,6 @@ export class Products implements OnInit {
 
     this.productService.deleteProduct(id).subscribe({
       next: () => {
-        this.productService.clearCache();
         this.products = this.products.filter((product) => product.id !== id);
         this.successMessage = 'Product deleted successfully.';
         this.cdr.markForCheck();

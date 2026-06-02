@@ -126,7 +126,6 @@ export class EditProduct implements OnInit {
       .subscribe({
         next: () => {
           this.successMessage = 'Product updated successfully.';
-          this.productService.clearCache();
           this.router.navigate(['/products']);
           this.cdr.markForCheck();
         },
