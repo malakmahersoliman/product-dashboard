@@ -29,7 +29,7 @@
     <div class="orders-summary">
       <article class="summary-card">
         <span class="summary-label">Total Orders</span>
-        <strong class="summary-value">{{ totalOrdersCount }}</strong>
+        <strong class="summary-value">{{ totalCount }}</strong>
       </article>
       <article class="summary-card summary-card--warning">
         <span class="summary-label">Pending</span>
@@ -51,6 +51,14 @@
         class="search-input"
         placeholder="Search by order # or customer name..."
         [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="number"
+        class="search-input"
+        placeholder="Customer ID"
+        [(ngModel)]="customerIdFilter"
+        (ngModelChange)="applyFilters()"
       />
 
       <div class="status-filters" role="group" aria-label="Filter by status">
@@ -65,13 +73,28 @@
           </button>
         }
       </div>
+      <div class="status-filters" role="group" aria-label="Filter by payment status">
+          @for (filter of paymentStatusFilters; track filter) {
+            <button
+              type="button"
+              class="filter-btn"
+              [class.active]="paymentStatusFilter === filter"
+              (click)="setPaymentStatusFilter(filter)"
+            >
+              {{ filter }}
+            </button>
+          }
+        </div>
+        <button type="button" class="filter-btn" (click)="resetFilters()">
+          Reset
+        </button>
     </div>
 
     <p class="result-count">
-      Showing {{ filteredOrders.length }} of {{ orders.length }} orders
+      Showing {{ orders.length }} of {{ totalCount }} orders
     </p>
 
-    @if (filteredOrders.length === 0) {
+    @if (orders.length === 0) {
       <div class="empty-state empty-filter">
         <p>No orders match your search or filter.</p>
       </div>
@@ -93,7 +116,7 @@
             </thead>
 
             <tbody>
-              @for (order of filteredOrders; track order.id) {
+              @for (order of orders; track order.id) {
                 <tr>
                   <td><strong class="order-id">#{{ order.id }}</strong></td>
                   <td>{{ order.customerName }}</td>
@@ -154,6 +177,41 @@
           </table>
         </div>
       </div>
+      <div class="pagination-panel">
+  <div class="pagination-info">
+    Page {{ pageNumber }} of {{ totalPages }}
+  </div>
+
+  <div class="pagination-actions">
+    <button
+      type="button"
+      class="filter-btn"
+      (click)="previousPage()"
+      [disabled]="pageNumber === 1"
+    >
+      Previous
+    </button>
+
+    <button
+      type="button"
+      class="filter-btn"
+      (click)="nextPage()"
+      [disabled]="pageNumber === totalPages"
+    >
+      Next
+    </button>
+    <select
+      class="search-input"
+      aria-label="Select page size"
+      [ngModel]="pageSize"
+      (ngModelChange)="pageSize = +$event; pageNumber = 1; loadOrders()"
+    >
+      <option [value]="5">5</option>
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+    </select>
+      </div>
+    </div>
     }
   }
 </section>

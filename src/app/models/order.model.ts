@@ -67,3 +67,13 @@ export interface CreateOrderItemRequest {
   productId: number;
   quantity: number;
 }
+export interface OrderFilterRequest {
+  search?: string;
+  customerId?: number | null;
+  status?: string;
+  paymentStatus?: string;
+  pageNumber: number;
+  pageSize: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
