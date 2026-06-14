@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject, effect } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -6,6 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+
 import { CartService } from '../../services/cart.service';
 import { CustomerService } from '../../services/customer.service';
 import { OrderService } from '../../services/order.service';
@@ -19,30 +20,25 @@ import { Customer } from '../../models/customer.model';
   styleUrl: './cart.css',
 })
 export class Cart implements OnInit {
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
+  private readonly customerService = inject(CustomerService);
+  private readonly orderService = inject(OrderService);
+  private readonly router = inject(Router);
+
   cartService = inject(CartService);
   authService = inject(AuthService);
-  private customerService = inject(CustomerService);
-  private orderService = inject(OrderService);
-  private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
 
-  customers: Customer[] = [];
-  isLoadingCustomers = false;
-  isSubmitting = false;
-  errorMessage: string | null = null;
+  customers = signal<Customer[]>([]);
+  isLoadingCustomers = signal(false);
+  isSubmitting = signal(false);
+  errorMessage = signal<string | null>(null);
 
   checkoutForm = this.fb.group({
     customerId: ['', Validators.required],
+    paymentMethod: ['Cash', Validators.required],
+    paymentShouldSucceed: [true, Validators.required],
+    paymentFailureReason: [''],
   });
-
-  constructor() {
-    effect(() => {
-      this.cartService.items();
-      this.cartService.total();
-      this.cdr.markForCheck();
-    });
-  }
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -54,8 +50,8 @@ export class Cart implements OnInit {
 
   get canPlaceOrder(): boolean {
     if (
-      this.isSubmitting ||
-      this.isLoadingCustomers ||
+      this.isSubmitting() ||
+      this.isLoadingCustomers() ||
       this.cartService.items().length === 0 ||
       this.checkoutForm.invalid
     ) {
@@ -69,46 +65,50 @@ export class Cart implements OnInit {
 
   get selectedCustomerName(): string | null {
     const customerId = Number(this.checkoutForm.value.customerId);
+
     if (!customerId) {
       return null;
     }
-    return this.customers.find((c) => c.id === customerId)?.name ?? null;
+
+    return this.customers().find((c) => c.id === customerId)?.name ?? null;
+  }
+
+  get paymentShouldSucceed(): boolean {
+    return this.checkoutForm.value.paymentShouldSucceed === true;
   }
 
   loadCustomers(): void {
-    this.isLoadingCustomers = true;
+    this.isLoadingCustomers.set(true);
+    this.errorMessage.set(null);
 
     this.customerService.getCustomers().subscribe({
       next: (customers) => {
-        this.customers = customers;
-        this.isLoadingCustomers = false;
+        this.customers.set(customers);
+        this.isLoadingCustomers.set(false);
       },
-      error: () => {
-        this.errorMessage = 'Failed to load customers.';
-        this.isLoadingCustomers = false;
+      error: (error) => {
+        console.error(error);
+        this.errorMessage.set('Failed to load customers.');
+        this.isLoadingCustomers.set(false);
       },
     });
   }
 
   onIncreaseInCart(productId: number): void {
     this.cartService.increaseInCart(productId);
-    this.cdr.markForCheck();
   }
 
   onDecreaseInCart(productId: number): void {
     this.cartService.decrease(productId);
-    this.cdr.markForCheck();
   }
 
   onRemoveFromCart(productId: number): void {
     this.cartService.remove(productId);
-    this.cdr.markForCheck();
   }
 
   onClearCart(): void {
     this.cartService.clear();
-    this.errorMessage = null;
-    this.cdr.markForCheck();
+    this.errorMessage.set(null);
   }
 
   canIncreaseInCart(item: { quantity: number; stock: number }): boolean {
@@ -126,12 +126,20 @@ export class Cart implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = null;
+    const formValue = this.checkoutForm.getRawValue();
+    const paymentShouldSucceed = formValue.paymentShouldSucceed === true;
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
 
     this.orderService
       .createOrder({
-        customerId: Number(this.checkoutForm.value.customerId),
+        customerId: Number(formValue.customerId),
+        paymentMethod: formValue.paymentMethod ?? 'Cash',
+        paymentShouldSucceed,
+        paymentFailureReason: paymentShouldSucceed
+          ? null
+          : formValue.paymentFailureReason?.trim() || 'Payment failed.',
         items: this.cartService.toOrderItems(),
       })
       .subscribe({
@@ -147,9 +155,12 @@ export class Cart implements OnInit {
             queryParams: { orderPlaced: 'true' },
           });
         },
-        error: () => {
-          this.errorMessage = 'Failed to create order. Please try again.';
-          this.isSubmitting = false;
+        error: (error) => {
+          this.errorMessage.set(
+            error.error?.message || 'Payment failed. Please try again.'
+          );
+
+          this.isSubmitting.set(false);
         },
       });
   }

@@ -2,56 +2,132 @@
   <div class="page-header">
     <div>
       <h2>Customers</h2>
+      <p class="page-subtitle">View and manage customer records</p>
     </div>
 
     @if (authService.isSuperAdmin()) {
-      <a class="primary-btn" routerLink="/customers/new">Add Customer</a>
+      <a class="primary-btn" routerLink="/customers/new">
+        Add Customer
+      </a>
     }
   </div>
 
-  @if (isLoading) {
+  @if (successMessage()) {
+    <p class="success-message">{{ successMessage() }}</p>
+  }
+
+  @if (errorMessage() && !isLoading() && customers().length > 0) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  }
+
+  @if (isLoading()) {
     <div class="loading-block">
       <span class="spinner"></span>
       <span>Loading customers...</span>
     </div>
-  } @else if (errorMessage) {
-    <p class="error-message">{{ errorMessage }}</p>
-  } @else if (customers.length === 0) {
-    <div class="empty-state">
-      <p>No customers found yet.</p>
-      @if (authService.isSuperAdmin()) {
-        <a class="primary-btn" routerLink="/customers/new">Add Customer</a>
-      }
-    </div>
+  } @else if (errorMessage() && customers().length === 0) {
+    <p class="error-message">{{ errorMessage() }}</p>
   } @else {
-    <div class="toolbar">
+    <div class="customers-summary">
+      <article class="summary-card">
+        <span class="summary-label">Total Customers</span>
+        <strong class="summary-value">{{ totalCustomersCount() }}</strong>
+      </article>
+
+      <article class="summary-card summary-card--success">
+        <span class="summary-label">Customer Directory</span>
+        <strong class="summary-value">{{ customers().length }}</strong>
+      </article>
+
+      <article class="summary-card summary-card--warning">
+        <span class="summary-label">Order Ready</span>
+        <strong class="summary-value">Active</strong>
+      </article>
+    </div>
+
+    <div class="customers-toolbar">
       <input
         type="search"
         class="search-input"
-        placeholder="Search by name or email..."
-        [(ngModel)]="searchTerm"
+        placeholder="Search by customer #, name, or email..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChanged($event)"
       />
-      <span class="result-count">
-        Showing {{ filteredCustomers.length }} of {{ customers.length }} customers
-      </span>
     </div>
 
-    @if (filteredCustomers.length === 0) {
-      <p class="state-message">No customers match your search.</p>
-    } @else {
-      <div class="customers-grid">
-        @for (customer of filteredCustomers; track customer.id) {
-          <article class="customer-card">
-            <div class="avatar">
-              {{ customer.name.charAt(0).toUpperCase() }}
-            </div>
+    <p class="result-count">
+      Showing {{ filteredCustomers().length }} of {{ customers().length }} customers
+    </p>
 
-            <div class="customer-info">
-              <h3>{{ customer.name }}</h3>
-              <p>{{ customer.email }}</p>
-            </div>
-          </article>
+    @if (customers().length === 0) {
+      <div class="empty-state">
+        <h3>No customers yet</h3>
+        <p>Create your first customer to start placing orders.</p>
+
+        @if (authService.isSuperAdmin()) {
+          <a class="primary-btn" routerLink="/customers/new">
+            Add Customer
+          </a>
         }
+      </div>
+    } @else if (filteredCustomers().length === 0) {
+      <div class="empty-state empty-filter">
+        <p>No customers match your search.</p>
+      </div>
+    } @else {
+      <div class="customers-table-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table customers-table">
+            <thead>
+              <tr>
+                <th>Customer #</th>
+                <th>Name</th>
+                <th>Email</th>
+
+                @if (authService.isSuperAdmin()) {
+                  <th>Actions</th>
+                }
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (customer of filteredCustomers(); track customer.id) {
+                <tr>
+                  <td>
+                    <strong class="customer-id">#{{ customer.id }}</strong>
+                  </td>
+
+                  <td>
+                    <strong class="customer-name">{{ customer.name }}</strong>
+                  </td>
+
+                  <td class="email-cell">{{ customer.email }}</td>
+
+                  @if (authService.isSuperAdmin()) {
+                    <td>
+                      <div class="table-actions">
+                        <a
+                          class="action-btn action-btn--edit"
+                          [routerLink]="['/customers', customer.id, 'edit']"
+                        >
+                          Edit
+                        </a>
+
+                        <button
+                          type="button"
+                          class="action-btn action-btn--delete"
+                          (click)="deleteCustomer(customer.id)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     }
   }

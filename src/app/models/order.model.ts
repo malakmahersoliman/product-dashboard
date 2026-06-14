@@ -4,12 +4,42 @@ export const ORDER_STATUS = {
   cancelled: 'Cancelled',
 } as const;
 
+export const PAYMENT_STATUS = {
+  unpaid: 'Unpaid',
+  paid: 'Paid',
+  paymentFailed: 'PaymentFailed',
+  refunded: 'Refunded',
+} as const;
+
 export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
+export type PaymentStatus = typeof PAYMENT_STATUS[keyof typeof PAYMENT_STATUS];
+
+export interface Order {
+  id: number;
+  orderDate: string;
+  status: OrderStatus | string;
+  paymentStatus: PaymentStatus | string;
+  totalAmount: number;
+  customerId: number;
+  customerName: string;
+  items: OrderItemResponse[];
+}
+export interface OrderResponse {
+  id: number;
+  orderDate: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: number;
+  customerId: number;
+  customerName: string;
+  items: OrderItemResponse[];
+}
 
 export interface OrderSummary {
   id: number;
   orderDate: string;
-  status: string;
+  status: OrderStatus | string;
+  paymentStatus: PaymentStatus | string;
   totalAmount: number;
   customerId: number;
   customerName: string;
@@ -25,22 +55,15 @@ export interface OrderItemResponse {
   subtotal: number;
 }
 
-export interface OrderResponse {
-  id: number;
-  orderDate: string;
-  status: string;
-  totalAmount: number;
+export interface CreateOrderRequest {
   customerId: number;
-  customerName: string;
-  items: OrderItemResponse[]; //this cuz of the relation between order and orderitems
+  paymentMethod: string;
+  paymentShouldSucceed: boolean;
+  paymentFailureReason?: string | null;
+  items: CreateOrderItemRequest[];
 }
 
 export interface CreateOrderItemRequest {
   productId: number;
   quantity: number;
-}
-
-export interface CreateOrderRequest {
-  customerId: number;
-  items: CreateOrderItemRequest[];
 }

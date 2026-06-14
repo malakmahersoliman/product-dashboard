@@ -50,6 +50,12 @@ export const routes: Routes = [
         import('./pages/add-customer/add-customer').then(m => m.AddCustomer)
    },
    {
+    path: 'customers/:id/edit',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+        import('./pages/edit-customer/edit-customer').then(m => m.EditCustomer),
+    },
+   {
     path: 'cart',
     canActivate: [AuthGuard],
     loadComponent: () =>

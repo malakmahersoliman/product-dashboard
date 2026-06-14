@@ -176,4 +176,24 @@ export class Orders implements OnInit {
       },
     });
   }
+    getPaymentStatusClass(paymentStatus: string | null | undefined): string {
+    const status = paymentStatus || 'Unpaid';
+
+    switch (status) {
+      case 'Paid':
+        return 'payment-badge payment-badge--paid';
+
+      case 'Refunded':
+        return 'payment-badge payment-badge--refunded';
+
+      case 'PaymentFailed':
+        return 'payment-badge payment-badge--failed';
+
+      default:
+        return 'payment-badge payment-badge--unpaid';
+    }
+  }
+  getPaymentStatusLabel(paymentStatus: string | null | undefined): string {
+    return paymentStatus || 'Unpaid';
+  }
 }

@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-block">
       <span class="spinner"></span>
       <span>Loading customers and products...</span>
@@ -19,7 +19,7 @@
         <select id="customerId" formControlName="customerId">
           <option value="">Select customer</option>
 
-          @for (customer of customers; track customer.id) {
+          @for (customer of customers(); track customer.id) {
             <option [value]="customer.id">{{ customer.name }}</option>
           }
         </select>
@@ -48,7 +48,7 @@
                   <select formControlName="productId">
                     <option value="">Select product</option>
 
-                    @for (product of products; track product.id) {
+                    @for (product of products(); track product.id) {
                       <option [value]="product.id">
                         {{ product.name }} — {{ product.price | currency }}
                       </option>
@@ -79,14 +79,61 @@
           }
         </div>
       </div>
+      <div class="payment-section">
+        <div class="items-header">
+          <h3>Payment</h3>
+        </div>
 
+        <div class="payment-grid">
+          <div>
+            <label for="paymentMethod">Payment Method</label>
+            <select id="paymentMethod" formControlName="paymentMethod">
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Wallet">Wallet</option>
+              <option value="BankTransfer">Bank Transfer</option>
+            </select>
+
+            @if (
+              orderForm.get('paymentMethod')?.touched &&
+              orderForm.get('paymentMethod')?.invalid
+            ) {
+              <small>Please select a payment method.</small>
+            }
+          </div>
+
+          <div>
+            <label for="paymentShouldSucceed">Payment Result</label>
+            <select id="paymentShouldSucceed" formControlName="paymentShouldSucceed">
+              <option [ngValue]="true">Success</option>
+              <option [ngValue]="false">Fail</option>
+            </select>
+          </div>
+        </div>
+
+        @if (!paymentShouldSucceed) {
+          <div>
+            <label for="paymentFailureReason">Failure Reason</label>
+            <input
+              id="paymentFailureReason"
+              type="text"
+              formControlName="paymentFailureReason"
+              placeholder="Example: Card declined"
+            />
+
+            <small class="payment-note">
+              This simulates a failed payment. The order will not be created.
+            </small>
+          </div>
+        }
+      </div>
       <div class="order-summary">
         <span>Estimated total</span>
-        <strong>{{ estimatedTotal | currency }}</strong>
+        <strong>{{ estimatedTotal() | currency }}</strong>
       </div>
 
-      <button type="submit" [disabled]="isSubmitting">
-        @if (isSubmitting) {
+      <button type="submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
           Creating order...
         } @else {
           Create Order
@@ -95,7 +142,7 @@
     </form>
   }
 
-  @if (errorMessage) {
-    <p class="error-message">{{ errorMessage }}</p>
+  @if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
   }
 </section>

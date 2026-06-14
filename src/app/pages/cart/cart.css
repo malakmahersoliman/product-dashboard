@@ -118,3 +118,33 @@
     width: 100%;
   }
 }
+.payment-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-border);
+}
+
+.section-title {
+  margin-bottom: 4px;
+}
+
+.section-title h4 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 16px;
+}
+
+.section-title p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.payment-note {
+  display: block;
+  margin-top: -4px;
+  color: var(--color-muted);
+  font-size: 12px;
+}

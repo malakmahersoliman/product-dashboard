@@ -8,8 +8,8 @@
     </div>
   </div>
 
-  @if (errorMessage) {
-    <p class="error-message cart-error">{{ errorMessage }}</p>
+  @if (errorMessage()) {
+    <p class="error-message cart-error">{{ errorMessage() }}</p>
   }
 
   @if (cartService.items().length === 0) {
@@ -91,71 +91,116 @@
         </div>
       </div>
 
-      <aside class="checkout-panel">
-        <div class="panel-heading">
-          <h3>Checkout</h3>
-        </div>
+    <aside class="checkout-panel">
+      <div class="panel-heading">
+        <h3>Checkout</h3>
+      </div>
 
-        <div class="customer-section">
+      <div class="customer-section">
+        <form [formGroup]="checkoutForm" (ngSubmit)="onPlaceOrder()">
           <label for="customerId">Customer</label>
-          <form [formGroup]="checkoutForm" (ngSubmit)="onPlaceOrder()">
-            <select id="customerId" formControlName="customerId">
-              <option value="">Select customer</option>
 
-              @for (customer of customers; track customer.id) {
-                <option [value]="customer.id">{{ customer.name }}</option>
-              }
+          <select id="customerId" formControlName="customerId">
+            <option value="">Select customer</option>
+
+            @for (customer of customers(); track customer.id) {
+              <option [value]="customer.id">{{ customer.name }}</option>
+            }
+          </select>
+
+          @if (
+            checkoutForm.get('customerId')?.touched &&
+            checkoutForm.get('customerId')?.invalid
+          ) {
+            <small class="field-error">Please select a customer.</small>
+          }
+
+          @if (selectedCustomerName) {
+            <div class="selected-customer">
+              <span class="selected-label">Selected</span>
+              <strong>{{ selectedCustomerName }}</strong>
+            </div>
+          }
+
+          <div class="payment-section">
+            <div class="section-title">
+              <h4>Payment</h4>
+              <p>Select how the customer will pay for this order.</p>
+            </div>
+
+            <label for="paymentMethod">Payment Method</label>
+            <select id="paymentMethod" formControlName="paymentMethod">
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Wallet">Wallet</option>
+              <option value="BankTransfer">Bank Transfer</option>
             </select>
 
             @if (
-              checkoutForm.get('customerId')?.touched &&
-              checkoutForm.get('customerId')?.invalid
+              checkoutForm.get('paymentMethod')?.touched &&
+              checkoutForm.get('paymentMethod')?.invalid
             ) {
-              <small class="field-error">Please select a customer.</small>
+              <small class="field-error">Please select a payment method.</small>
             }
 
-            @if (selectedCustomerName) {
-              <div class="selected-customer">
-                <span class="selected-label">Selected</span>
-                <strong>{{ selectedCustomerName }}</strong>
-              </div>
-            }
+            <label for="paymentShouldSucceed">Payment Result</label>
+            <select id="paymentShouldSucceed" formControlName="paymentShouldSucceed">
+              <option [ngValue]="true">Success</option>
+              <option [ngValue]="false">Fail</option>
+            </select>
 
-            <div class="order-summary">
-              <div class="summary-row">
-                <span>Subtotal</span>
-                <strong>{{ subtotal | currency }}</strong>
-              </div>
-              <div class="summary-row summary-row--total">
-                <span>Estimated Total</span>
-                <strong>{{ subtotal | currency }}</strong>
-              </div>
-              <p class="summary-note">{{ cartService.itemCount() }} items in this order</p>
+            @if (!paymentShouldSucceed) {
+              <label for="paymentFailureReason">Failure Reason</label>
+              <input
+                id="paymentFailureReason"
+                type="text"
+                formControlName="paymentFailureReason"
+                placeholder="Example: Card declined"
+              />
+
+              <small class="payment-note">
+                This simulates a failed payment. The order will not be created.
+              </small>
+            }
+          </div>
+
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <strong>{{ subtotal | currency }}</strong>
             </div>
 
-            <button
-              type="submit"
-              class="create-order-btn"
-              [disabled]="!canPlaceOrder"
-            >
-              @if (isSubmitting) {
-                Creating order...
-              } @else {
-                Create Order
-              }
-            </button>
+            <div class="summary-row summary-row--total">
+              <span>Estimated Total</span>
+              <strong>{{ subtotal | currency }}</strong>
+            </div>
 
-            <button
-              type="button"
-              class="clear-cart-btn"
-              [disabled]="isSubmitting"
-              (click)="onClearCart()"
-            >
-              Clear Cart
-            </button>
-          </form>
-        </div>
-      </aside>
+            <p class="summary-note">{{ cartService.itemCount() }} items in this order</p>
+          </div>
+
+          <button
+            type="submit"
+            class="create-order-btn"
+            [disabled]="!canPlaceOrder"
+          >
+            @if (isSubmitting()) {
+              Creating order...
+            } @else {
+              Create Order
+            }
+          </button>
+
+          <button
+            type="button"
+            class="clear-cart-btn"
+            [disabled]="isSubmitting()"
+            (click)="onClearCart()"
+          >
+            Clear Cart
+          </button>
+        </form>
+      </div>
+    </aside>
     </div>
   }
 </section>

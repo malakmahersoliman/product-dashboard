@@ -1,0 +1,53 @@
+<section class="page-container">
+  <a class="back-link" routerLink="/customers">← Back to customers</a>
+
+  <div class="page-header">
+    <div>
+      <h2>Edit Customer</h2>
+      <p>Update customer information used in orders.</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading customer...</span>
+    </div>
+  } @else {
+    <form class="form-card form-stack" [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" />
+
+        @if (customerForm.get('name')?.touched && customerForm.get('name')?.invalid) {
+          <small>Name is required and must be at most 200 characters.</small>
+        }
+      </div>
+
+      <div>
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" />
+
+        @if (customerForm.get('email')?.touched && customerForm.get('email')?.invalid) {
+          <small>Please enter a valid email.</small>
+        }
+      </div>
+
+      <button type="submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          Saving...
+        } @else {
+          Update Customer
+        }
+      </button>
+    </form>
+  }
+
+  @if (successMessage()) {
+    <p class="success-message">{{ successMessage() }}</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  }
+</section>

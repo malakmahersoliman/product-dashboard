@@ -1,0 +1,7 @@
+.form-card {
+  max-width: 640px;
+}
+
+button[type='submit'] {
+  align-self: flex-start;
+}

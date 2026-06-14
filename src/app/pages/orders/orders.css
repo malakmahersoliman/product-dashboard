@@ -1,25 +1,34 @@
-.result-count {
-  margin: 0 0 14px;
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border: 1px solid transparent;
 }
 
-.orders-table {
-  min-width: 960px;
+.payment-badge--paid {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #bbf7d0;
 }
 
-.order-id {
-  color: var(--color-primary);
+.payment-badge--unpaid {
+  color: #92400e;
+  background: #fef3c7;
+  border-color: #fde68a;
 }
 
-.amount-cell {
-  font-weight: 700;
+.payment-badge--failed {
+  color: #991b1b;
+  background: #fee2e2;
+  border-color: #fecaca;
 }
 
-.date-cell {
-  color: var(--color-muted);
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.table-actions {
-  gap: 6px;
+.payment-badge--refunded {
+  color: #3730a3;
+  background: #e0e7ff;
+  border-color: #c7d2fe;
 }

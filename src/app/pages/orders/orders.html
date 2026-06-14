@@ -87,6 +87,7 @@
                 <th>Total</th>
                 <th>Items</th>
                 <th>Created</th>
+                <th>Payment</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -105,10 +106,16 @@
                   <td>{{ itemCount(order) }}</td>
                   <td class="date-cell">{{ formatDate(order.orderDate) }}</td>
                   <td>
+                <span [class]="getPaymentStatusClass(order.paymentStatus)">
+                  {{ getPaymentStatusLabel(order.paymentStatus) }}
+                </span>
+              </td>
+                  <td>
                     <div class="table-actions">
                       <a class="action-btn action-btn--view" [routerLink]="['/orders', order.id]">
                         View Details
                       </a>
+                  
 
                       @if (canComplete(order)) {
                         <button

@@ -4,7 +4,7 @@ export interface Customer {
   email: string;
 }
 
-export interface CreateCustomerRequest {
+export interface CustomerRequest {
   name: string;
   email: string;
 }

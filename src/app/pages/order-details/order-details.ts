@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   OrderResponse,
+  PAYMENT_STATUS,
   OrderItemResponse,
   ORDER_STATUS,
   OrderStatus,
@@ -136,4 +137,25 @@ export class OrderDetails implements OnInit {
       },
     });
   }
+getPaymentStatusLabel(paymentStatus: string | null | undefined): string {
+  return paymentStatus || PAYMENT_STATUS.unpaid;
+}
+
+getPaymentStatusClass(paymentStatus: string | null | undefined): string {
+  const status = paymentStatus || PAYMENT_STATUS.unpaid;
+
+  switch (status) {
+    case PAYMENT_STATUS.paid:
+      return 'payment-badge--paid';
+
+    case PAYMENT_STATUS.refunded:
+      return 'payment-badge--refunded';
+
+    case PAYMENT_STATUS.paymentFailed:
+      return 'payment-badge--failed';
+
+    default:
+      return 'payment-badge--unpaid';
+  }
+}
 }
