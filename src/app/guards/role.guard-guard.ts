@@ -11,4 +11,5 @@ export const RoleGuard: CanActivateFn = () => {
   }
 
   return router.createUrlTree(['/products']);
+
 };

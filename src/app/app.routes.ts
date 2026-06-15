@@ -74,7 +74,7 @@ export const routes: Routes = [
    },
    {
     path: 'orders',
-    canActivate:[AuthGuard, RoleGuard],
+    canActivate:[AuthGuard],
     loadComponent: ()=>
         import('./pages/orders/orders').then(m=> m.Orders)
    },
