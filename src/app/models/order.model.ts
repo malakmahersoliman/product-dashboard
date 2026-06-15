@@ -69,7 +69,7 @@ export interface CreateOrderItemRequest {
 }
 export interface OrderFilterRequest {
   search?: string;
-  customerId?: number | null;
+  customerName?: string;
   status?: string;
   paymentStatus?: string;
   pageNumber: number;

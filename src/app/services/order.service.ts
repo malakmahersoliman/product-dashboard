@@ -25,7 +25,7 @@ export class OrderService {
       .set('sortDirection', filter.sortDirection ?? 'desc');
 
     if (filter.search) params = params.set('search', filter.search);
-    if (filter.customerId) params = params.set('customerId', filter.customerId);
+    if (filter.customerName) params = params.set('customerName', filter.customerName);
     if (filter.status) params = params.set('status', filter.status);
     if (filter.paymentStatus) params = params.set('paymentStatus', filter.paymentStatus);
 

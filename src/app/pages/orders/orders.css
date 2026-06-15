@@ -32,3 +32,33 @@
   background: #e0e7ff;
   border-color: #c7d2fe;
 }
+
+.page-size-field {
+  display: grid;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.page-size-label {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.orders-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  width: 100%;
+}
+
+.orders-search-btn {
+  min-width: 110px;
+  align-self: stretch;
+}
+
+@media (max-width: 800px) {
+  .orders-search-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -6,13 +6,14 @@ import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { ProductCard } from '../../components/product-card/product-card';
+import { Pagination } from '../../components/pagination/pagination';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-products',
-  imports: [ProductCard, RouterLink, CommonModule, FormsModule],
+  imports: [ProductCard, Pagination, RouterLink, CommonModule, FormsModule],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -143,21 +144,8 @@ export class Products implements OnInit {
     this.loadProducts();
   }
 
-  goToPreviousPage(): void {
-    if (this.pageNumber <= 1) {
-      return;
-    }
-
-    this.pageNumber--;
-    this.loadProducts();
-  }
-
-  goToNextPage(): void {
-    if (this.pageNumber >= this.totalPages) {
-      return;
-    }
-
-    this.pageNumber++;
+  onPageChange(pageNumber: number): void {
+    this.pageNumber = pageNumber;
     this.loadProducts();
   }
 

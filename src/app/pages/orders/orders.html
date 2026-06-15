@@ -46,20 +46,25 @@
     </div>
 
     <div class="orders-toolbar">
-      <input
-        type="search"
-        class="search-input"
-        placeholder="Search by order # or customer name..."
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="applyFilters()"
-      />
-      <input
-        type="number"
-        class="search-input"
-        placeholder="Customer ID"
-        [(ngModel)]="customerIdFilter"
-        (ngModelChange)="applyFilters()"
-      />
+      <div class="orders-search-row">
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search by order #..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearchChanged()"
+        />
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search by full customer name..."
+          [(ngModel)]="customerNameFilter"
+          (keyup.enter)="onSearchChanged()"
+        />
+        <button type="button" class="primary-btn orders-search-btn" (click)="onSearchChanged()">
+          Search
+        </button>
+      </div>
 
       <div class="status-filters" role="group" aria-label="Filter by status">
         @for (filter of statusFilters; track filter) {
@@ -88,6 +93,20 @@
         <button type="button" class="filter-btn" (click)="resetFilters()">
           Reset
         </button>
+
+        <label class="page-size-field">
+          <span class="page-size-label">Page size</span>
+          <select
+            class="search-input"
+            aria-label="Select page size"
+            [(ngModel)]="pageSize"
+            (ngModelChange)="onPageSizeChanged()"
+          >
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+          </select>
+        </label>
     </div>
 
     <p class="result-count">
@@ -177,41 +196,16 @@
           </table>
         </div>
       </div>
-      <div class="pagination-panel">
-  <div class="pagination-info">
-    Page {{ pageNumber }} of {{ totalPages }}
-  </div>
 
-  <div class="pagination-actions">
-    <button
-      type="button"
-      class="filter-btn"
-      (click)="previousPage()"
-      [disabled]="pageNumber === 1"
-    >
-      Previous
-    </button>
-
-    <button
-      type="button"
-      class="filter-btn"
-      (click)="nextPage()"
-      [disabled]="pageNumber === totalPages"
-    >
-      Next
-    </button>
-    <select
-      class="search-input"
-      aria-label="Select page size"
-      [ngModel]="pageSize"
-      (ngModelChange)="pageSize = +$event; pageNumber = 1; loadOrders()"
-    >
-      <option [value]="5">5</option>
-      <option [value]="10">10</option>
-      <option [value]="20">20</option>
-    </select>
-      </div>
-    </div>
+      <app-pagination
+        [pageNumber]="pageNumber"
+        [totalPages]="totalPages"
+        [totalCount]="totalCount"
+        [currentItemsCount]="orders.length"
+        [disabled]="isLoading"
+        itemLabel="orders"
+        (pageChange)="onPageChange($event)"
+      />
     }
   }
 </section>

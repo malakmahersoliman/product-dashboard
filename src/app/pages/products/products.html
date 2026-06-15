@@ -198,38 +198,14 @@
       }
     </div>
 
-    <div class="pagination-panel">
-      <div class="pagination-summary">
-        <strong>{{ products.length }}</strong>
-        <span>items on this page</span>
-        <span class="dot-separator">•</span>
-        <strong>{{ totalCount }}</strong>
-        <span>total matches</span>
-      </div>
-
-      <div class="pagination-actions">
-        <button
-          type="button"
-          class="secondary-btn"
-          (click)="goToPreviousPage()"
-          [disabled]="pageNumber <= 1 || isLoading"
-        >
-          Previous
-        </button>
-
-        <span class="pagination-info">
-          {{ totalPages === 0 ? 0 : pageNumber }} / {{ totalPages }}
-        </span>
-
-        <button
-          type="button"
-          class="secondary-btn"
-          (click)="goToNextPage()"
-          [disabled]="pageNumber >= totalPages || isLoading"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <app-pagination
+      [pageNumber]="pageNumber"
+      [totalPages]="totalPages"
+      [totalCount]="totalCount"
+      [currentItemsCount]="products.length"
+      [disabled]="isLoading"
+      itemLabel="products"
+      (pageChange)="onPageChange($event)"
+    />
   }
 </section>

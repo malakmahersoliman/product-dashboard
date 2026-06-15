@@ -11,6 +11,7 @@ import {
 } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 import { RouterLink } from '@angular/router';
+import { Pagination } from '../../components/pagination/pagination';
 
 type StatusFilter = 'All' | OrderStatus;
 type PaymentStatusFilter = 'All' | PaymentStatus;
@@ -18,7 +19,7 @@ type PaymentStatusFilter = 'All' | PaymentStatus;
 
 @Component({
   selector: 'app-orders',
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, Pagination],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
@@ -42,7 +43,7 @@ export class Orders implements OnInit {
   PAYMENT_STATUS.refunded,
 ];
 
-    customerIdFilter: number | null = null;
+    customerNameFilter = '';
 
     pageNumber = 1;
     pageSize = 10;
@@ -84,7 +85,7 @@ export class Orders implements OnInit {
 
       const filter: OrderFilterRequest = {
         search: this.searchTerm.trim() || undefined,
-        customerId: this.customerIdFilter,
+        customerName: this.customerNameFilter.trim() || undefined,
         status: this.statusFilter === 'All' ? undefined : this.statusFilter,
         paymentStatus:
           this.paymentStatusFilter === 'All' ? undefined : this.paymentStatusFilter,
@@ -223,7 +224,7 @@ setStatusFilter(filter: StatusFilter): void {
   this.pageNumber = 1;
   this.loadOrders();
 }
-applyFilters(): void {
+onSearchChanged(): void {
   this.pageNumber = 1;
   this.loadOrders();
 }
@@ -232,32 +233,17 @@ resetFilters(): void {
   this.searchTerm = '';
   this.statusFilter = 'All';
   this.paymentStatusFilter = 'All';
-  this.customerIdFilter = null;
+  this.customerNameFilter = '';
   this.pageNumber = 1;
   this.loadOrders();
 }
 
-goToPage(page: number): void {
-  if (page < 1 || page > this.totalPages) {
-    return;
-  }
-
-  this.pageNumber = page;
+onPageChange(pageNumber: number): void {
+  this.pageNumber = pageNumber;
   this.loadOrders();
 }
 
-nextPage(): void {
-  this.goToPage(this.pageNumber + 1);
-}
-
-previousPage(): void {
-  this.goToPage(this.pageNumber - 1);
-}
-
-changePageSize(event: Event): void {
-  const value = Number((event.target as HTMLSelectElement).value);
-
-  this.pageSize = value;
+onPageSizeChanged(): void {
   this.pageNumber = 1;
   this.loadOrders();
 }

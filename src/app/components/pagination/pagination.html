@@ -1,0 +1,59 @@
+@if (totalPages > 0) {
+  <div class="pagination-panel">
+    <div class="pagination-summary">
+      <strong>{{ currentItemsCount }}</strong>
+      <span>{{ itemLabel }} on this page</span>
+      <span class="dot-separator">•</span>
+      <strong>{{ totalCount }}</strong>
+      <span>total matches</span>
+    </div>
+
+    <div class="pagination-actions">
+      <button
+        type="button"
+        class="secondary-btn pagination-nav-btn"
+        (click)="goToPreviousPage()"
+        [disabled]="pageNumber <= 1 || disabled"
+        aria-label="Previous page"
+      >
+        Previous
+      </button>
+
+      @if (showPageNumbers && visiblePages.length > 0) {
+        <div class="pagination-pages" role="group" aria-label="Page numbers">
+          @for (page of visiblePages; track $index) {
+            @if (isPageNumber(page)) {
+              <button
+                type="button"
+                class="pagination-page-btn"
+                [class.pagination-page-btn--active]="page === pageNumber"
+                (click)="goToPage(page)"
+                [disabled]="disabled"
+                [attr.aria-current]="page === pageNumber ? 'page' : null"
+                [attr.aria-label]="'Page ' + page"
+              >
+                {{ page }}
+              </button>
+            } @else {
+              <span class="pagination-ellipsis" aria-hidden="true">…</span>
+            }
+          }
+        </div>
+      } @else {
+        <span class="pagination-info">
+          {{ totalPages === 0 ? 0 : pageNumber }} / {{ totalPages }}
+        </span>
+      }
+
+      <button
+        type="button"
+        class="secondary-btn pagination-nav-btn"
+        (click)="goToNextPage()"
+        [disabled]="pageNumber >= totalPages || disabled"
+        aria-label="Next page"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+}
