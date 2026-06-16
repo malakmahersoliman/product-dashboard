@@ -19,95 +19,23 @@
     </div>
   } @else if (errorMessage && orders.length === 0) {
     <p class="error-message">{{ errorMessage }}</p>
-  } @else if (orders.length === 0) {
+  } @else if (totalCount === 0 && !hasActiveFilters) {
     <div class="empty-state">
       <h3>No orders yet</h3>
       <p>Create your first order from the cart to get started.</p>
       <a class="primary-btn" routerLink="/cart">Create Order</a>
     </div>
   } @else {
-    <div class="orders-summary">
-      <article class="summary-card">
-        <span class="summary-label">Total Orders</span>
-        <strong class="summary-value">{{ totalCount }}</strong>
-      </article>
-      <article class="summary-card summary-card--warning">
-        <span class="summary-label">Pending</span>
-        <strong class="summary-value">{{ pendingCount }}</strong>
-      </article>
-      <article class="summary-card summary-card--success">
-        <span class="summary-label">Completed</span>
-        <strong class="summary-value">{{ completedCount }}</strong>
-      </article>
-      <article class="summary-card summary-card--danger">
-        <span class="summary-label">Cancelled</span>
-        <strong class="summary-value">{{ cancelledCount }}</strong>
-      </article>
-    </div>
-
-    <div class="orders-toolbar">
-      <div class="orders-search-row">
-        <input
-          type="search"
-          class="search-input"
-          placeholder="Search by order #..."
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearchChanged()"
-        />
-        <input
-          type="search"
-          class="search-input"
-          placeholder="Search by full customer name..."
-          [(ngModel)]="customerNameFilter"
-          (keyup.enter)="onSearchChanged()"
-        />
-        <button type="button" class="primary-btn orders-search-btn" (click)="onSearchChanged()">
-          Search
-        </button>
-      </div>
-
-      <div class="status-filters" role="group" aria-label="Filter by status">
-        @for (filter of statusFilters; track filter) {
-          <button
-            type="button"
-            class="filter-btn"
-            [class.active]="statusFilter === filter"
-            (click)="setStatusFilter(filter)"
-          >
-            {{ filter }}
-          </button>
-        }
-      </div>
-      <div class="status-filters" role="group" aria-label="Filter by payment status">
-          @for (filter of paymentStatusFilters; track filter) {
-            <button
-              type="button"
-              class="filter-btn"
-              [class.active]="paymentStatusFilter === filter"
-              (click)="setPaymentStatusFilter(filter)"
-            >
-              {{ filter }}
-            </button>
-          }
-        </div>
-        <button type="button" class="filter-btn" (click)="resetFilters()">
-          Reset
-        </button>
-
-        <label class="page-size-field">
-          <span class="page-size-label">Page size</span>
-          <select
-            class="search-input"
-            aria-label="Select page size"
-            [(ngModel)]="pageSize"
-            (ngModelChange)="onPageSizeChanged()"
-          >
-            <option [ngValue]="5">5</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-          </select>
-        </label>
-    </div>
+    <app-list-filter-panel
+      title="Find orders"
+      subtitle="Adjust filters, then click Search to update results."
+      [fields]="orderFilterFields"
+      [initialValues]="defaultOrderFilterValues"
+      [defaultPageSize]="10"
+      [pageSizeOptions]="[5, 10, 20]"
+      [disabled]="isLoading"
+      (search)="onFilterSearch($event)"
+    />
 
     <p class="result-count">
       Showing {{ orders.length }} of {{ totalCount }} orders

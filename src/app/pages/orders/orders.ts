@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import {
   PAYMENT_STATUS,
   ORDER_STATUS,
@@ -12,14 +11,19 @@ import {
 import { OrderService } from '../../services/order.service';
 import { RouterLink } from '@angular/router';
 import { Pagination } from '../../components/pagination/pagination';
+import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
+import {
+  FilterValues,
+  ListFilterField,
+  ListFilterSearchEvent,
+} from '../../components/list-filter-panel/list-filter-panel.model';
 
 type StatusFilter = 'All' | OrderStatus;
 type PaymentStatusFilter = 'All' | PaymentStatus;
 
-
 @Component({
   selector: 'app-orders',
-  imports: [RouterLink, CommonModule, FormsModule, Pagination],
+  imports: [RouterLink, CommonModule, Pagination, ListFilterPanel],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
@@ -28,33 +32,58 @@ export class Orders implements OnInit {
   searchTerm = '';
   statusFilter: StatusFilter = 'All';
   paymentStatusFilter: PaymentStatusFilter = 'All';
+  customerNameFilter = '';
 
-  readonly statusFilters: StatusFilter[] = [
-    'All',
-    ORDER_STATUS.pending,
-    ORDER_STATUS.completed,
-    ORDER_STATUS.cancelled,
+  pageNumber = 1;
+  pageSize = 10;
+  totalCount = 0;
+  totalPages = 0;
+
+  isLoading = false;
+  ORDER_STATUS = ORDER_STATUS;
+  PAYMENT_STATUS = PAYMENT_STATUS;
+  errorMessage: string | null = null;
+  updatingOrderId: number | null = null;
+
+  readonly orderFilterFields: ListFilterField[] = [
+    {
+      key: 'search',
+      type: 'search',
+      placeholder: 'Search by order #...',
+      ariaLabel: 'Search by order number',
+    },
+    {
+      key: 'customerName',
+      type: 'search',
+      placeholder: 'Search by full customer name...',
+      ariaLabel: 'Search by customer name',
+    },
+    {
+      key: 'status',
+      type: 'button-group',
+      label: 'Order status',
+      groupLabel: 'Filter by order status',
+      options: [
+        { label: 'All', value: 'All' },
+        { label: ORDER_STATUS.pending, value: ORDER_STATUS.pending },
+        { label: ORDER_STATUS.completed, value: ORDER_STATUS.completed },
+        { label: ORDER_STATUS.cancelled, value: ORDER_STATUS.cancelled },
+      ],
+    },
+    {
+      key: 'paymentStatus',
+      type: 'button-group',
+      label: 'Payment status',
+      groupLabel: 'Filter by payment status',
+      options: [
+        { label: 'All', value: 'All' },
+        { label: PAYMENT_STATUS.unpaid, value: PAYMENT_STATUS.unpaid },
+        { label: PAYMENT_STATUS.paid, value: PAYMENT_STATUS.paid },
+        { label: PAYMENT_STATUS.paymentFailed, value: PAYMENT_STATUS.paymentFailed },
+        { label: PAYMENT_STATUS.refunded, value: PAYMENT_STATUS.refunded },
+      ],
+    },
   ];
-  readonly paymentStatusFilters: PaymentStatusFilter[] = [
-  'All',
-  PAYMENT_STATUS.unpaid,
-  PAYMENT_STATUS.paid,
-  PAYMENT_STATUS.paymentFailed,
-  PAYMENT_STATUS.refunded,
-];
-
-    customerNameFilter = '';
-
-    pageNumber = 1;
-    pageSize = 10;
-    totalCount = 0;
-    totalPages = 0;
-
-    isLoading = false;
-    ORDER_STATUS = ORDER_STATUS;
-    PAYMENT_STATUS = PAYMENT_STATUS;
-    errorMessage: string | null = null;
-    updatingOrderId: number | null = null;
 
   constructor(
     private orderService: OrderService,
@@ -64,9 +93,19 @@ export class Orders implements OnInit {
   ngOnInit(): void {
     this.loadOrders();
   }
-    get totalOrdersCount(): number {
-      return this.totalCount;
-    }
+
+  get defaultOrderFilterValues(): FilterValues {
+    return {
+      search: '',
+      customerName: '',
+      status: 'All',
+      paymentStatus: 'All',
+    };
+  }
+
+  get totalOrdersCount(): number {
+    return this.totalCount;
+  }
 
   get pendingCount(): number {
     return this.orders.filter((o) => o.status === ORDER_STATUS.pending).length;
@@ -79,47 +118,60 @@ export class Orders implements OnInit {
   get cancelledCount(): number {
     return this.orders.filter((o) => o.status === ORDER_STATUS.cancelled).length;
   }
-    loadOrders(): void {
-      this.isLoading = true;
-      this.errorMessage = null;
 
-      const filter: OrderFilterRequest = {
-        search: this.searchTerm.trim() || undefined,
-        customerName: this.customerNameFilter.trim() || undefined,
-        status: this.statusFilter === 'All' ? undefined : this.statusFilter,
-        paymentStatus:
-          this.paymentStatusFilter === 'All' ? undefined : this.paymentStatusFilter,
-        pageNumber: this.pageNumber,
-        pageSize: this.pageSize,
-        sortBy: 'orderDate',
-        sortDirection: 'desc',
-      };
+  get hasActiveFilters(): boolean {
+    return (
+      !!this.searchTerm.trim() ||
+      !!this.customerNameFilter.trim() ||
+      this.statusFilter !== 'All' ||
+      this.paymentStatusFilter !== 'All'
+    );
+  }
 
-      this.orderService.getOrders(filter).subscribe({
-        next: (response) => {
-          this.orders = response.items;
-          this.pageNumber = response.pageNumber;
-          this.pageSize = response.pageSize;
-          this.totalCount = response.totalCount;
-          this.totalPages = response.totalPages;
+  onFilterSearch(event: ListFilterSearchEvent): void {
+    this.searchTerm = String(event.values['search'] ?? '');
+    this.customerNameFilter = String(event.values['customerName'] ?? '');
+    this.statusFilter = event.values['status'] as StatusFilter;
+    this.paymentStatusFilter = event.values['paymentStatus'] as PaymentStatusFilter;
+    this.pageSize = event.pageSize;
+    this.pageNumber = 1;
+    this.loadOrders();
+  }
 
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.errorMessage = 'Failed to load orders. Please try again later.';
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        },
-      });
-    }
+  loadOrders(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
 
+    const filter: OrderFilterRequest = {
+      search: this.searchTerm.trim() || undefined,
+      customerName: this.customerNameFilter.trim() || undefined,
+      status: this.statusFilter === 'All' ? undefined : this.statusFilter,
+      paymentStatus:
+        this.paymentStatusFilter === 'All' ? undefined : this.paymentStatusFilter,
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
+      sortBy: 'orderDate',
+      sortDirection: 'desc',
+    };
 
-setStatusFilter(filter: StatusFilter): void {
-  this.statusFilter = filter;
-  this.pageNumber = 1;
-  this.loadOrders();
-}
+    this.orderService.getOrders(filter).subscribe({
+      next: (response) => {
+        this.orders = response.items;
+        this.pageNumber = response.pageNumber;
+        this.pageSize = response.pageSize;
+        this.totalCount = response.totalCount;
+        this.totalPages = response.totalPages;
+
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load orders. Please try again later.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -199,7 +251,8 @@ setStatusFilter(filter: StatusFilter): void {
       },
     });
   }
-    getPaymentStatusClass(paymentStatus: string | null | undefined): string {
+
+  getPaymentStatusClass(paymentStatus: string | null | undefined): string {
     const status = paymentStatus || 'Unpaid';
 
     switch (status) {
@@ -216,35 +269,13 @@ setStatusFilter(filter: StatusFilter): void {
         return 'payment-badge payment-badge--unpaid';
     }
   }
+
   getPaymentStatusLabel(paymentStatus: string | null | undefined): string {
     return paymentStatus || 'Unpaid';
   }
-  setPaymentStatusFilter(filter: PaymentStatusFilter): void {
-  this.paymentStatusFilter = filter;
-  this.pageNumber = 1;
-  this.loadOrders();
-}
-onSearchChanged(): void {
-  this.pageNumber = 1;
-  this.loadOrders();
-}
 
-resetFilters(): void {
-  this.searchTerm = '';
-  this.statusFilter = 'All';
-  this.paymentStatusFilter = 'All';
-  this.customerNameFilter = '';
-  this.pageNumber = 1;
-  this.loadOrders();
-}
-
-onPageChange(pageNumber: number): void {
-  this.pageNumber = pageNumber;
-  this.loadOrders();
-}
-
-onPageSizeChanged(): void {
-  this.pageNumber = 1;
-  this.loadOrders();
-}
+  onPageChange(pageNumber: number): void {
+    this.pageNumber = pageNumber;
+    this.loadOrders();
+  }
 }

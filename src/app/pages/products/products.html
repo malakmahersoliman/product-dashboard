@@ -44,113 +44,16 @@
     </article>
   </div>
 
-  <section class="products-filter-panel">
-    <div class="filter-panel-header">
-      <div>
-        <h3>Find products</h3>
-        <p>Search, filter, and sort inventory from the backend.</p>
-      </div>
-
-      <button type="button" class="secondary-btn" (click)="resetFilters()">
-        Reset Filters
-      </button>
-    </div>
-
-    <div class="search-row">
-      <div class="search-box">
-        <span class="search-icon">⌕</span>
-        <input
-          type="search"
-          class="search-input"
-          placeholder="Search by product name or category..."
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearchChanged()"
-        />
-      </div>
-
-      <button type="button" class="primary-btn search-btn" (click)="onSearchChanged()">
-        Search
-      </button>
-    </div>
-
-    <div class="filters-grid">
-      <label class="filter-field">
-        <span>Category</span>
-        <select
-          [(ngModel)]="selectedCategoryId"
-          (ngModelChange)="onFiltersChanged()"
-          [disabled]="categoriesLoading"
-        >
-          <option [ngValue]="null">
-            @if (categoriesLoading) {
-              Loading categories...
-            } @else {
-              All categories
-            }
-          </option>
-
-          @for (category of categories; track category.id) {
-            <option [ngValue]="category.id">{{ category.name }}</option>
-          }
-        </select>
-      </label>
-
-      <label class="filter-field">
-        <span>Availability</span>
-        <select
-          [(ngModel)]="selectedAvailability"
-          (ngModelChange)="onFiltersChanged()"
-        >
-          <option [ngValue]="null">All availability</option>
-          <option [ngValue]="true">Available</option>
-          <option [ngValue]="false">Unavailable</option>
-        </select>
-      </label>
-
-      <label class="filter-field">
-        <span>Stock</span>
-        <select
-          [(ngModel)]="selectedStockStatus"
-          (ngModelChange)="onFiltersChanged()"
-        >
-          <option value="">All stock</option>
-          <option value="inStock">In stock</option>
-          <option value="lowStock">Low stock</option>
-          <option value="outOfStock">Out of stock</option>
-        </select>
-      </label>
-
-      <label class="filter-field">
-        <span>Sort</span>
-        <select
-          [ngModel]="sortBy + ':' + sortDirection"
-          (ngModelChange)="setSort($event)"
-        >
-          <option value="name:asc">Name A-Z</option>
-          <option value="name:desc">Name Z-A</option>
-          <option value="price:asc">Price Low to High</option>
-          <option value="price:desc">Price High to Low</option>
-          <option value="stock:asc">Stock Low to High</option>
-          <option value="stock:desc">Stock High to Low</option>
-          <option value="category:asc">Category A-Z</option>
-          <option value="category:desc">Category Z-A</option>
-        </select>
-      </label>
-
-      <label class="filter-field">
-        <span>Page size</span>
-        <select
-          [(ngModel)]="pageSize"
-          (ngModelChange)="onPageSizeChanged()"
-        >
-          <option [ngValue]="6">6 per page</option>
-          <option [ngValue]="10">10 per page</option>
-          <option [ngValue]="12">12 per page</option>
-          <option [ngValue]="20">20 per page</option>
-        </select>
-      </label>
-    </div>
-  </section>
+  <app-list-filter-panel
+    title="Find products"
+    subtitle="Adjust filters and sorting, then click Search to update results."
+    [fields]="productFilterFields"
+    [initialValues]="defaultProductFilterValues"
+    [defaultPageSize]="10"
+    [pageSizeOptions]="[6, 10, 12, 20]"
+    [disabled]="isLoading"
+    (search)="onFilterSearch($event)"
+  />
 
   <div class="results-header">
     <div>
@@ -179,10 +82,6 @@
       <p>Try changing your search, filters, or page size.</p>
 
       <div class="empty-actions">
-        <button type="button" class="secondary-btn" (click)="resetFilters()">
-          Reset Filters
-        </button>
-
         @if (authService.isSuperAdmin()) {
           <a class="primary-btn" routerLink="/products/new">Add Product</a>
         }

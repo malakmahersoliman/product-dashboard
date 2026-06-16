@@ -1,0 +1,114 @@
+<section class="list-filter-panel" aria-label="List filters">
+  <div class="list-filter-panel__header">
+    <div>
+      <h3 class="list-filter-panel__title">{{ title }}</h3>
+      <p class="list-filter-panel__subtitle">{{ subtitle }}</p>
+    </div>
+
+    <button
+      type="button"
+      class="secondary-btn list-filter-panel__reset-btn"
+      (click)="onReset()"
+      [disabled]="disabled"
+    >
+      {{ resetLabel }}
+    </button>
+  </div>
+
+  @if (searchFields.length > 0) {
+    <div class="list-filter-panel__search-row">
+      @for (field of searchFields; track field.key) {
+        <div class="list-filter-panel__search-box">
+          <span class="list-filter-panel__search-icon" aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            class="search-input list-filter-panel__search-input"
+            [placeholder]="field.placeholder ?? 'Search...'"
+            [attr.aria-label]="field.ariaLabel ?? field.label ?? field.placeholder"
+            [disabled]="disabled || !!field.disabled"
+            [ngModel]="getDraftValue(field.key)"
+            (ngModelChange)="setDraftValue(field.key, $event)"
+            (keydown)="onSearchKeydown($event)"
+          />
+        </div>
+      }
+    </div>
+  }
+
+  @if (selectFields.length > 0) {
+    <div class="list-filter-panel__filters-grid">
+      @for (field of selectFields; track field.key) {
+        <label class="list-filter-panel__field">
+          <span>{{ field.label }}</span>
+          <select
+            [disabled]="disabled || !!field.disabled"
+            [ngModel]="getDraftValue(field.key)"
+            (ngModelChange)="setDraftValue(field.key, $event)"
+          >
+            @for (option of field.options; track option.label) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+      }
+    </div>
+  }
+
+  @for (field of buttonGroupFields; track field.key) {
+    <div
+      class="list-filter-panel__button-group"
+      role="group"
+      [attr.aria-label]="field.groupLabel ?? field.label"
+    >
+      @if (field.label) {
+        <span class="list-filter-panel__group-label">{{ field.label }}</span>
+      }
+
+      <div class="list-filter-panel__buttons">
+        @for (option of field.options; track option.label) {
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="isButtonActive(field, option.value)"
+            [disabled]="disabled || !!field.disabled"
+            (click)="setDraftValue(field.key, option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="list-filter-panel__footer">
+    <label class="list-filter-panel__page-size">
+      <span>{{ pageSizeLabel }}</span>
+      <select
+        [disabled]="disabled"
+        [(ngModel)]="draftPageSize"
+        aria-label="Select page size"
+      >
+        @for (size of pageSizeOptions; track size) {
+          <option [ngValue]="size">{{ size }} per page</option>
+        }
+      </select>
+    </label>
+
+    <div class="list-filter-panel__actions">
+      @if (hasPendingChanges) {
+        <span class="list-filter-panel__pending" aria-live="polite">
+          Unapplied changes
+        </span>
+      }
+
+      <button
+        type="button"
+        class="primary-btn list-filter-panel__search-btn"
+        (click)="onSearch()"
+        [disabled]="disabled"
+      >
+        {{ searchLabel }}
+      </button>
+    </div>
+  </div>
+</section>

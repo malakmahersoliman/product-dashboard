@@ -1,19 +1,24 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { ProductCard } from '../../components/product-card/product-card';
 import { Pagination } from '../../components/pagination/pagination';
+import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
+import {
+  FilterValues,
+  ListFilterField,
+  ListFilterSearchEvent,
+} from '../../components/list-filter-panel/list-filter-panel.model';
 import { AuthService } from '../../services/auth.service';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-products',
-  imports: [ProductCard, Pagination, RouterLink, CommonModule, FormsModule],
+  imports: [ProductCard, Pagination, ListFilterPanel, RouterLink, CommonModule],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -129,46 +134,97 @@ export class Products implements OnInit {
       });
   }
 
-  onFiltersChanged(): void {
-    this.pageNumber = 1;
-    this.loadProducts();
+  get productFilterFields(): ListFilterField[] {
+    return [
+      {
+        key: 'search',
+        type: 'search',
+        placeholder: 'Search by product name or category...',
+        ariaLabel: 'Search products',
+      },
+      {
+        key: 'categoryId',
+        type: 'select',
+        label: 'Category',
+        disabled: this.categoriesLoading,
+        options: [
+          {
+            label: this.categoriesLoading ? 'Loading categories...' : 'All categories',
+            value: null,
+          },
+          ...this.categories.map((category) => ({
+            label: category.name,
+            value: category.id,
+          })),
+        ],
+      },
+      {
+        key: 'availability',
+        type: 'select',
+        label: 'Availability',
+        options: [
+          { label: 'All availability', value: null },
+          { label: 'Available', value: true },
+          { label: 'Unavailable', value: false },
+        ],
+      },
+      {
+        key: 'stockStatus',
+        type: 'select',
+        label: 'Stock',
+        options: [
+          { label: 'All stock', value: '' },
+          { label: 'In stock', value: 'inStock' },
+          { label: 'Low stock', value: 'lowStock' },
+          { label: 'Out of stock', value: 'outOfStock' },
+        ],
+      },
+      {
+        key: 'sort',
+        type: 'select',
+        label: 'Sort',
+        options: [
+          { label: 'Name A-Z', value: 'name:asc' },
+          { label: 'Name Z-A', value: 'name:desc' },
+          { label: 'Price Low to High', value: 'price:asc' },
+          { label: 'Price High to Low', value: 'price:desc' },
+          { label: 'Stock Low to High', value: 'stock:asc' },
+          { label: 'Stock High to Low', value: 'stock:desc' },
+          { label: 'Category A-Z', value: 'category:asc' },
+          { label: 'Category Z-A', value: 'category:desc' },
+        ],
+      },
+    ];
   }
 
-  onSearchChanged(): void {
-    this.pageNumber = 1;
-    this.loadProducts();
+  get defaultProductFilterValues(): FilterValues {
+    return {
+      search: '',
+      categoryId: null,
+      availability: null,
+      stockStatus: '',
+      sort: 'name:asc',
+    };
   }
 
-  onPageSizeChanged(): void {
+  onFilterSearch(event: ListFilterSearchEvent): void {
+    this.searchTerm = String(event.values['search'] ?? '');
+    this.selectedCategoryId = event.values['categoryId'] as number | null;
+    this.selectedAvailability = event.values['availability'] as boolean | null;
+    this.selectedStockStatus = String(event.values['stockStatus'] ?? '');
+
+    const sortValue = String(event.values['sort'] ?? 'name:asc');
+    const [sortBy, sortDirection] = sortValue.split(':');
+    this.sortBy = sortBy;
+    this.sortDirection = sortDirection;
+
+    this.pageSize = event.pageSize;
     this.pageNumber = 1;
     this.loadProducts();
   }
 
   onPageChange(pageNumber: number): void {
     this.pageNumber = pageNumber;
-    this.loadProducts();
-  }
-
-  setSort(sortValue: string): void {
-    const [sortBy, sortDirection] = sortValue.split(':');
-
-    this.sortBy = sortBy;
-    this.sortDirection = sortDirection;
-    this.pageNumber = 1;
-
-    this.loadProducts();
-  }
-
-  resetFilters(): void {
-    this.searchTerm = '';
-    this.selectedCategoryId = null;
-    this.selectedAvailability = null;
-    this.selectedStockStatus = '';
-    this.sortBy = 'name';
-    this.sortDirection = 'asc';
-    this.pageNumber = 1;
-    this.pageSize = 10;
-
     this.loadProducts();
   }
 
