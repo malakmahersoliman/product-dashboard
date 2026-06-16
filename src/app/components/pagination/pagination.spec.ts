@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 
 import { Pagination } from './pagination';
 
@@ -25,13 +26,13 @@ describe('Pagination', () => {
   });
 
   it('should emit pageChange when navigating to next page', () => {
-    const spy = spyOn(component.pageChange, 'emit');
+    const spy = vi.spyOn(component.pageChange, 'emit');
     component.goToNextPage();
     expect(spy).toHaveBeenCalledWith(2);
   });
 
   it('should not emit pageChange when already on first page', () => {
-    const spy = spyOn(component.pageChange, 'emit');
+    const spy = vi.spyOn(component.pageChange, 'emit');
     component.goToPreviousPage();
     expect(spy).not.toHaveBeenCalled();
   });
