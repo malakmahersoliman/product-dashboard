@@ -7,7 +7,7 @@ import { CreateUserRequest,User } from '../models/user.model';
   providedIn: 'root',
 })
 export class UserService {
-  private readonly apiUrl = 'https://localhost:YOUR_PORT/api/users';
+  private readonly apiUrl = 'https://localhost:7220/api/users';
 
   constructor(private http: HttpClient) {}
 

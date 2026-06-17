@@ -66,4 +66,19 @@ describe('ListFilterPanel', () => {
     expect(resetSpy).toHaveBeenCalled();
     expect(searchSpy).toHaveBeenCalled();
   });
+
+  it('should keep draft values when initialValues reference changes with same values', () => {
+    component.setDraftValue('search', 'pending query');
+    component.ngOnChanges({
+      initialValues: {
+        currentValue: { search: '', status: 'All' },
+        previousValue: { search: '', status: 'All' },
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.getDraftValue('search')).toBe('pending query');
+    expect(component.hasPendingChanges).toBe(true);
+  });
 });

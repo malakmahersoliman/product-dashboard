@@ -45,6 +45,13 @@ export class Orders implements OnInit {
   errorMessage: string | null = null;
   updatingOrderId: number | null = null;
 
+  readonly defaultOrderFilterValues: FilterValues = {
+    search: '',
+    customerName: '',
+    status: 'All',
+    paymentStatus: 'All',
+  };
+
   readonly orderFilterFields: ListFilterField[] = [
     {
       key: 'search',
@@ -92,15 +99,6 @@ export class Orders implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
-  }
-
-  get defaultOrderFilterValues(): FilterValues {
-    return {
-      search: '',
-      customerName: '',
-      status: 'All',
-      paymentStatus: 'All',
-    };
   }
 
   get totalOrdersCount(): number {

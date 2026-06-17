@@ -46,6 +46,66 @@ export class Products implements OnInit {
   sortBy = 'name';
   sortDirection = 'asc';
 
+  readonly defaultProductFilterValues: FilterValues = {
+    search: '',
+    categoryId: null,
+    availability: null,
+    stockStatus: '',
+    sort: 'name:asc',
+  };
+
+  readonly productFilterFields: ListFilterField[] = [
+    {
+      key: 'search',
+      type: 'search',
+      placeholder: 'Search by product name or category...',
+      ariaLabel: 'Search products',
+    },
+    {
+      key: 'categoryId',
+      type: 'select',
+      label: 'Category',
+      disabled: true,
+      options: [{ label: 'Loading categories...', value: null }],
+    },
+    {
+      key: 'availability',
+      type: 'select',
+      label: 'Availability',
+      options: [
+        { label: 'All availability', value: null },
+        { label: 'Available', value: true },
+        { label: 'Unavailable', value: false },
+      ],
+    },
+    {
+      key: 'stockStatus',
+      type: 'select',
+      label: 'Stock',
+      options: [
+        { label: 'All stock', value: '' },
+        { label: 'In stock', value: 'inStock' },
+        { label: 'Low stock', value: 'lowStock' },
+        { label: 'Out of stock', value: 'outOfStock' },
+      ],
+    },
+    {
+      key: 'sort',
+      type: 'select',
+      label: 'Sort',
+      options: [
+        { label: 'Name A-Z', value: 'name:asc' },
+        { label: 'Name Z-A', value: 'name:desc' },
+        { label: 'Price Low to High', value: 'price:asc' },
+        { label: 'Price High to Low', value: 'price:desc' },
+        { label: 'Stock Low to High', value: 'stock:asc' },
+        { label: 'Stock High to Low', value: 'stock:desc' },
+        { label: 'Category A-Z', value: 'category:asc' },
+        { label: 'Category Z-A', value: 'category:desc' },
+      ],
+    },
+  ];
+
   authService = inject(AuthService);
 
   private readonly route = inject(ActivatedRoute);
@@ -88,6 +148,7 @@ export class Products implements OnInit {
     this.categoryService.getCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
+        this.updateCategoryFilterOptions();
         this.categoriesLoading = false;
         this.cdr.markForCheck();
       },
@@ -134,79 +195,6 @@ export class Products implements OnInit {
       });
   }
 
-  get productFilterFields(): ListFilterField[] {
-    return [
-      {
-        key: 'search',
-        type: 'search',
-        placeholder: 'Search by product name or category...',
-        ariaLabel: 'Search products',
-      },
-      {
-        key: 'categoryId',
-        type: 'select',
-        label: 'Category',
-        disabled: this.categoriesLoading,
-        options: [
-          {
-            label: this.categoriesLoading ? 'Loading categories...' : 'All categories',
-            value: null,
-          },
-          ...this.categories.map((category) => ({
-            label: category.name,
-            value: category.id,
-          })),
-        ],
-      },
-      {
-        key: 'availability',
-        type: 'select',
-        label: 'Availability',
-        options: [
-          { label: 'All availability', value: null },
-          { label: 'Available', value: true },
-          { label: 'Unavailable', value: false },
-        ],
-      },
-      {
-        key: 'stockStatus',
-        type: 'select',
-        label: 'Stock',
-        options: [
-          { label: 'All stock', value: '' },
-          { label: 'In stock', value: 'inStock' },
-          { label: 'Low stock', value: 'lowStock' },
-          { label: 'Out of stock', value: 'outOfStock' },
-        ],
-      },
-      {
-        key: 'sort',
-        type: 'select',
-        label: 'Sort',
-        options: [
-          { label: 'Name A-Z', value: 'name:asc' },
-          { label: 'Name Z-A', value: 'name:desc' },
-          { label: 'Price Low to High', value: 'price:asc' },
-          { label: 'Price High to Low', value: 'price:desc' },
-          { label: 'Stock Low to High', value: 'stock:asc' },
-          { label: 'Stock High to Low', value: 'stock:desc' },
-          { label: 'Category A-Z', value: 'category:asc' },
-          { label: 'Category Z-A', value: 'category:desc' },
-        ],
-      },
-    ];
-  }
-
-  get defaultProductFilterValues(): FilterValues {
-    return {
-      search: '',
-      categoryId: null,
-      availability: null,
-      stockStatus: '',
-      sort: 'name:asc',
-    };
-  }
-
   onFilterSearch(event: ListFilterSearchEvent): void {
     this.searchTerm = String(event.values['search'] ?? '');
     this.selectedCategoryId = event.values['categoryId'] as number | null;
@@ -226,6 +214,23 @@ export class Products implements OnInit {
   onPageChange(pageNumber: number): void {
     this.pageNumber = pageNumber;
     this.loadProducts();
+  }
+
+  private updateCategoryFilterOptions(): void {
+    const categoryField = this.productFilterFields.find((field) => field.key === 'categoryId');
+
+    if (!categoryField || categoryField.type !== 'select') {
+      return;
+    }
+
+    categoryField.disabled = false;
+    categoryField.options = [
+      { label: 'All categories', value: null },
+      ...this.categories.map((category) => ({
+        label: category.name,
+        value: category.id,
+      })),
+    ];
   }
 
   onDeleteProduct(id: number): void {

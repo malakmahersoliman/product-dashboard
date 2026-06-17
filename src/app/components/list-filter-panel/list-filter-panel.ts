@@ -36,8 +36,28 @@ export class ListFilterPanel implements OnChanges {
   private appliedPageSize = 10;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['initialValues'] || changes['defaultPageSize'] || changes['fields']) {
+    const initialValuesChange = changes['initialValues'];
+    const defaultPageSizeChange = changes['defaultPageSize'];
+
+    const initialValuesChanged =
+      !!initialValuesChange &&
+      (initialValuesChange.firstChange ||
+        !this.areFilterValuesEqual(
+          initialValuesChange.currentValue,
+          initialValuesChange.previousValue
+        ));
+
+    if (initialValuesChanged || defaultPageSizeChange?.firstChange) {
       this.syncDraftFromInitial();
+      return;
+    }
+
+    if (
+      defaultPageSizeChange &&
+      defaultPageSizeChange.previousValue !== defaultPageSizeChange.currentValue
+    ) {
+      this.draftPageSize = this.defaultPageSize;
+      this.appliedPageSize = this.defaultPageSize;
     }
   }
 
@@ -119,5 +139,28 @@ export class ListFilterPanel implements OnChanges {
     this.draftPageSize = this.defaultPageSize;
     this.appliedValues = { ...this.draftValues };
     this.appliedPageSize = this.draftPageSize;
+  }
+
+  private areFilterValuesEqual(
+    current: FilterValues | undefined,
+    previous: FilterValues | undefined
+  ): boolean {
+    if (current === previous) {
+      return true;
+    }
+
+    if (!current || !previous) {
+      return false;
+    }
+
+    const keys = new Set([...Object.keys(current), ...Object.keys(previous)]);
+
+    for (const key of keys) {
+      if (current[key] !== previous[key]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

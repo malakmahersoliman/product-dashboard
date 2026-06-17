@@ -124,7 +124,9 @@
           </table>
         </div>
       </div>
+    }
 
+    @if (totalPages > 1) {
       <app-pagination
         [pageNumber]="pageNumber"
         [totalPages]="totalPages"

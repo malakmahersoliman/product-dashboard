@@ -96,7 +96,9 @@
         ></app-product-card>
       }
     </div>
+  }
 
+  @if (!isLoading && totalPages > 1) {
     <app-pagination
       [pageNumber]="pageNumber"
       [totalPages]="totalPages"
