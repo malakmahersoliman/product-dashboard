@@ -1,1 +1,16 @@
-<p>create-user works!</p>
+<section class="page-container">
+  <a class="back-link" routerLink="/users">← Back to users</a>
+
+  <div class="page-header">
+    <div>
+      <h2>Add User</h2>
+      <p>Create a staff account with email, password, and role.</p>
+    </div>
+  </div>
+
+  <app-user-form
+    [isSubmitting]="isSubmitting()"
+    [errorMessage]="errorMessage()"
+    (submitted)="onSubmit($event)"
+  />
+</section>

@@ -4,7 +4,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 
 import { CustomerService } from '../../services/customer.service';
 import { Customer, CustomerRequest } from '../../models/customer.model';
-import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 
 
@@ -18,8 +17,6 @@ import { Router, RouterLink } from '@angular/router';
 export class Customers implements OnInit {
   private readonly customerService = inject(CustomerService);
   private readonly fb = inject(FormBuilder);
-
-  authService = inject(AuthService);
 
   customers = signal<Customer[]>([]);
   isLoading = signal(false);

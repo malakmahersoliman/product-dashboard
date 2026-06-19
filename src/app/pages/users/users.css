@@ -1,0 +1,45 @@
+.users-page {
+  display: grid;
+  gap: 22px;
+}
+
+.users-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.users-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.users-toolbar .search-input {
+  width: 100%;
+}
+
+.result-count {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.empty-filter {
+  padding: 28px 20px;
+}
+
+.empty-state .primary-btn {
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  .users-toolbar {
+    padding: 14px;
+  }
+}

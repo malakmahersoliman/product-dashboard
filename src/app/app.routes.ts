@@ -45,13 +45,13 @@ export const routes: Routes = [
    },
    {
     path: 'customers/new',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [AuthGuard],
     loadComponent: () =>
         import('./pages/add-customer/add-customer').then(m => m.AddCustomer)
    },
    {
     path: 'customers/:id/edit',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [AuthGuard],
     loadComponent: () =>
         import('./pages/edit-customer/edit-customer').then(m => m.EditCustomer),
     },
@@ -90,6 +90,18 @@ export const routes: Routes = [
     loadComponent: () =>
         import('./pages/categories/categories').then(m => m.Categories),
     },
+   {
+    path: 'users',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+        import('./pages/users/users').then(m => m.Users),
+   },
+   {
+    path: 'users/new',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+        import('./pages/create-user/create-user').then(m => m.CreateUser),
+   },
    {
     path:'**',
     loadComponent: () => 

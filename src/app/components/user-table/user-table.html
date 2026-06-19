@@ -1,1 +1,37 @@
-<p>user-table works!</p>
+<div class="users-table-panel">
+  <div class="data-table-wrapper">
+    <table class="data-table users-table">
+      <thead>
+        <tr>
+          <th>User #</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr>
+            <td>
+              <strong class="user-id">#{{ user.id }}</strong>
+            </td>
+
+            <td class="email-cell">{{ user.email }}</td>
+
+            <td>
+              <span
+                class="role-badge"
+                [class.role-badge--admin]="user.role === 'SuperAdmin'"
+              >
+                {{ user.role === 'SuperAdmin' ? 'Super Admin' : 'User' }}
+              </span>
+            </td>
+
+            <td class="date-cell">{{ user.createdAt | date: 'mediumDate' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

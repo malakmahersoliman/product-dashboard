@@ -1,1 +1,72 @@
-<p>users works!</p>
+<section class="users-page page-container">
+  <div class="page-header">
+    <div>
+      <h2>Users</h2>
+      <p class="page-subtitle">Manage staff accounts and access roles</p>
+    </div>
+
+    <a class="primary-btn" routerLink="/users/new">
+      Add User
+    </a>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-block">
+      <span class="spinner"></span>
+      <span>Loading users...</span>
+    </div>
+  } @else if (errorMessage() && users().length === 0) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  } @else {
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    <div class="users-summary">
+      <article class="summary-card">
+        <span class="summary-label">Total Users</span>
+        <strong class="summary-value">{{ totalUsersCount() }}</strong>
+      </article>
+
+      <article class="summary-card summary-card--info">
+        <span class="summary-label">Super Admins</span>
+        <strong class="summary-value">{{ superAdminCount() }}</strong>
+      </article>
+
+      <article class="summary-card summary-card--success">
+        <span class="summary-label">Regular Users</span>
+        <strong class="summary-value">{{ regularUserCount() }}</strong>
+      </article>
+    </div>
+
+    <div class="users-toolbar">
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Search by user #, email, or role..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChanged($event)"
+      />
+    </div>
+
+    <p class="result-count">
+      Showing {{ filteredUsers().length }} of {{ users().length }} users
+    </p>
+
+    @if (users().length === 0) {
+      <div class="empty-state">
+        <h3>No users yet</h3>
+        <p>Create the first staff account to get started.</p>
+        <a class="primary-btn" routerLink="/users/new">
+          Add User
+        </a>
+      </div>
+    } @else if (filteredUsers().length === 0) {
+      <div class="empty-state empty-filter">
+        <p>No users match your search.</p>
+      </div>
+    } @else {
+      <app-user-table [users]="filteredUsers()" />
+    }
+  }
+</section>

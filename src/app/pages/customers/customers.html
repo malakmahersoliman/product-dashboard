@@ -5,11 +5,9 @@
       <p class="page-subtitle">View and manage customer records</p>
     </div>
 
-    @if (authService.isSuperAdmin()) {
-      <a class="primary-btn" routerLink="/customers/new">
-        Add Customer
-      </a>
-    }
+    <a class="primary-btn" routerLink="/customers/new">
+      Add Customer
+    </a>
   </div>
 
   @if (successMessage()) {
@@ -64,11 +62,9 @@
         <h3>No customers yet</h3>
         <p>Create your first customer to start placing orders.</p>
 
-        @if (authService.isSuperAdmin()) {
-          <a class="primary-btn" routerLink="/customers/new">
-            Add Customer
-          </a>
-        }
+        <a class="primary-btn" routerLink="/customers/new">
+          Add Customer
+        </a>
       </div>
     } @else if (filteredCustomers().length === 0) {
       <div class="empty-state empty-filter">
@@ -83,10 +79,7 @@
                 <th>Customer #</th>
                 <th>Name</th>
                 <th>Email</th>
-
-                @if (authService.isSuperAdmin()) {
-                  <th>Actions</th>
-                }
+                <th>Actions</th>
               </tr>
             </thead>
 
@@ -103,26 +96,24 @@
 
                   <td class="email-cell">{{ customer.email }}</td>
 
-                  @if (authService.isSuperAdmin()) {
-                    <td>
-                      <div class="table-actions">
-                        <a
-                          class="action-btn action-btn--edit"
-                          [routerLink]="['/customers', customer.id, 'edit']"
-                        >
-                          Edit
-                        </a>
+                  <td>
+                    <div class="table-actions">
+                      <a
+                        class="action-btn action-btn--edit"
+                        [routerLink]="['/customers', customer.id, 'edit']"
+                      >
+                        Edit
+                      </a>
 
-                        <button
-                          type="button"
-                          class="action-btn action-btn--delete"
-                          (click)="deleteCustomer(customer.id)"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  }
+                      <button
+                        type="button"
+                        class="action-btn action-btn--delete"
+                        (click)="deleteCustomer(customer.id)"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               }
             </tbody>
