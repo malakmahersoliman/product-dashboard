@@ -1,31 +1,54 @@
-import { Component, OnInit, inject, signal , computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CustomerService } from '../../services/customer.service';
 import { Customer, CustomerRequest } from '../../models/customer.model';
 import { Router, RouterLink } from '@angular/router';
+import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
+import {
+  FilterValues,
+  ListFilterField,
+  ListFilterSearchEvent,
+} from '../../components/list-filter-panel/list-filter-panel.model';
 
 
 
 @Component({
   selector: 'app-customers',
-  imports: [CommonModule, RouterLink,FormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ListFilterPanel],
   templateUrl: './customers.html',
   styleUrl: './customers.css',
 })
 export class Customers implements OnInit {
+  @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
+
   private readonly customerService = inject(CustomerService);
   private readonly fb = inject(FormBuilder);
 
   customers = signal<Customer[]>([]);
   isLoading = signal(false);
-  searchTerm = signal('');
+  appliedSearchTerm = signal('');
 
   errorMessage = signal('');
   successMessage = signal('');
 
   editingCustomerId = signal<number | null>(null);
+
+  readonly defaultCustomerFilterValues: FilterValues = {
+    search: '',
+  };
+
+  readonly customerFilterFields: ListFilterField[] = [
+    {
+      key: 'search',
+      type: 'search',
+      label: 'Search',
+      chipLabel: 'Search',
+      placeholder: 'Customer #, name, or email...',
+      ariaLabel: 'Search customers',
+    },
+  ];
 
   customerForm = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -86,22 +109,28 @@ export class Customers implements OnInit {
       email: formValue.email?.trim() ?? '',
     };
   }
-  onSearchChanged(value: string): void {
-  this.searchTerm.set(value);
+  onFilterSearch(event: ListFilterSearchEvent): void {
+    this.appliedSearchTerm.set(String(event.values['search'] ?? '').trim());
   }
+
+  clearFilters(): void {
+    this.filterPanel?.onReset();
+  }
+
   filteredCustomers = computed(() => {
-  const term = this.searchTerm().trim().toLowerCase();
+    const term = this.appliedSearchTerm().toLowerCase();
 
-  if (!term) {
-    return this.customers();
-  }
+    if (!term) {
+      return this.customers();
+    }
 
-  return this.customers().filter(customer =>
-    customer.name.toLowerCase().includes(term) ||
-    customer.email.toLowerCase().includes(term) ||
-    customer.id.toString().includes(term)
-  );
-});
+    return this.customers().filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(term) ||
+        customer.email.toLowerCase().includes(term) ||
+        customer.id.toString().includes(term)
+    );
+  });
 
-totalCustomersCount = computed(() => this.customers().length); 
+  totalCustomersCount = computed(() => this.customers().length);
 }

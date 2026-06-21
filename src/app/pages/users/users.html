@@ -1,6 +1,7 @@
-<section class="users-page page-container">
-  <div class="page-header">
+<section class="users-page list-page page-container">
+  <div class="page-header list-page__header">
     <div>
+      <span class="eyebrow">Administration</span>
       <h2>Users</h2>
       <p class="page-subtitle">Manage staff accounts and access roles</p>
     </div>
@@ -39,18 +40,16 @@
       </article>
     </div>
 
-    <div class="users-toolbar">
-      <input
-        type="search"
-        class="search-input"
-        placeholder="Search by user #, email, or role..."
-        [ngModel]="searchTerm()"
-        (ngModelChange)="onSearchChanged($event)"
-      />
-    </div>
+    <app-list-filter-panel
+      [fields]="userFilterFields"
+      [initialValues]="defaultUserFilterValues"
+      [disabled]="isLoading()"
+      (search)="onFilterSearch($event)"
+    />
 
-    <p class="result-count">
-      Showing {{ filteredUsers().length }} of {{ users().length }} users
+    <p class="list-results-summary">
+      Showing <strong>{{ filteredUsers().length }}</strong> of
+      <strong>{{ users().length }}</strong> users
     </p>
 
     @if (users().length === 0) {
@@ -62,8 +61,14 @@
         </a>
       </div>
     } @else if (filteredUsers().length === 0) {
-      <div class="empty-state empty-filter">
-        <p>No users match your search.</p>
+      <div class="empty-state empty-state--filtered">
+        <h3>No users match your search</h3>
+        <p>Try a different email, role, or user number.</p>
+        <div class="empty-state-actions">
+          <button type="button" class="secondary-btn" (click)="clearFilters()">
+            Clear search
+          </button>
+        </div>
       </div>
     } @else {
       <app-user-table [users]="filteredUsers()" />

@@ -151,7 +151,7 @@ export class Cart implements OnInit {
             return;
           }
 
-          this.router.navigate(['/products'], {
+          this.router.navigate(['/orders'], {
             queryParams: { orderPlaced: 'true' },
           });
         },

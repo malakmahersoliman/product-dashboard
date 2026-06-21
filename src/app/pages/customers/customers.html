@@ -1,6 +1,7 @@
-<section class="customers-page page-container">
+<section class="customers-page list-page page-container">
   <div class="page-header">
     <div>
+      <span class="eyebrow">CRM</span>
       <h2>Customers</h2>
       <p class="page-subtitle">View and manage customer records</p>
     </div>
@@ -31,30 +32,18 @@
         <span class="summary-label">Total Customers</span>
         <strong class="summary-value">{{ totalCustomersCount() }}</strong>
       </article>
-
-      <article class="summary-card summary-card--success">
-        <span class="summary-label">Customer Directory</span>
-        <strong class="summary-value">{{ customers().length }}</strong>
-      </article>
-
-      <article class="summary-card summary-card--warning">
-        <span class="summary-label">Order Ready</span>
-        <strong class="summary-value">Active</strong>
-      </article>
     </div>
 
-    <div class="customers-toolbar">
-      <input
-        type="search"
-        class="search-input"
-        placeholder="Search by customer #, name, or email..."
-        [ngModel]="searchTerm()"
-        (ngModelChange)="onSearchChanged($event)"
-      />
-    </div>
+    <app-list-filter-panel
+      [fields]="customerFilterFields"
+      [initialValues]="defaultCustomerFilterValues"
+      [disabled]="isLoading()"
+      (search)="onFilterSearch($event)"
+    />
 
-    <p class="result-count">
-      Showing {{ filteredCustomers().length }} of {{ customers().length }} customers
+    <p class="list-results-summary">
+      Showing <strong>{{ filteredCustomers().length }}</strong> of
+      <strong>{{ customers().length }}</strong> customers
     </p>
 
     @if (customers().length === 0) {
@@ -67,8 +56,14 @@
         </a>
       </div>
     } @else if (filteredCustomers().length === 0) {
-      <div class="empty-state empty-filter">
-        <p>No customers match your search.</p>
+      <div class="empty-state empty-state--filtered">
+        <h3>No customers match your search</h3>
+        <p>Try a different name, email, or customer number.</p>
+        <div class="empty-state-actions">
+          <button type="button" class="secondary-btn" (click)="clearFilters()">
+            Clear search
+          </button>
+        </div>
       </div>
     } @else {
       <div class="customers-table-panel">

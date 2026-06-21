@@ -48,6 +48,8 @@
       [fields]="productFilterFields"
       [initialValues]="defaultProductFilterValues"
       [disabled]="isLoading"
+      [collapsible]="true"
+      refineLabel="Refine filters"
       (search)="onFilterSearch($event)"
     />
 

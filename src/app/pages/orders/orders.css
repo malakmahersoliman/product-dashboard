@@ -42,3 +42,12 @@
   background: #e0e7ff;
   border-color: #c7d2fe;
 }
+
+.orders-table .table-actions {
+  min-width: 108px;
+}
+
+.orders-table .table-actions--admin {
+  min-width: 148px;
+  max-width: 180px;
+}

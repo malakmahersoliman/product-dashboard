@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -9,6 +9,7 @@ import {
   OrderStatus,
 } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-order-details',
@@ -17,6 +18,8 @@ import { OrderService } from '../../services/order.service';
   styleUrl: './order-details.css',
 })
 export class OrderDetails implements OnInit {
+  authService = inject(AuthService);
+
   order: OrderResponse | null = null;
   isLoading = false;
   errorMessage = '';

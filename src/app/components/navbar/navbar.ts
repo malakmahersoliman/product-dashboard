@@ -13,6 +13,7 @@ import { CartService } from '../../services/cart.service';
 export class Navbar implements OnInit, OnDestroy {
   showShell = false;
   sidebarOpen = false;
+  pageTitle = 'Dashboard';
 
   private routerSub?: Subscription;
 
@@ -30,12 +31,14 @@ export class Navbar implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateShellVisibility();
+    this.updatePageTitle();
 
     this.routerSub = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.sidebarOpen = false;
         this.updateShellVisibility();
+        this.updatePageTitle();
       });
   }
 
@@ -73,5 +76,57 @@ export class Navbar implements OnInit, OnDestroy {
     }
 
     return route.routeConfig?.path;
+  }
+
+  private updatePageTitle(): void {
+    const segments = this.router.url.split('?')[0].split('/').filter(Boolean);
+    const root = segments[0] ?? '';
+
+    if (root === 'products' && segments[1] === 'new') {
+      this.pageTitle = 'Add Product';
+      return;
+    }
+
+    if (root === 'products' && segments[2] === 'edit') {
+      this.pageTitle = 'Edit Product';
+      return;
+    }
+
+    if (root === 'products' && segments[1]) {
+      this.pageTitle = 'Product Details';
+      return;
+    }
+
+    if (root === 'customers' && segments[1] === 'new') {
+      this.pageTitle = 'Add Customer';
+      return;
+    }
+
+    if (root === 'customers' && segments[2] === 'edit') {
+      this.pageTitle = 'Edit Customer';
+      return;
+    }
+
+    if (root === 'orders' && segments[1]) {
+      this.pageTitle = 'Order Details';
+      return;
+    }
+
+    if (root === 'users' && segments[1] === 'new') {
+      this.pageTitle = 'Create User';
+      return;
+    }
+
+    const titles: Record<string, string> = {
+      dashboard: 'Dashboard',
+      categories: 'Categories',
+      products: 'Products',
+      customers: 'Customers',
+      cart: 'New Order',
+      orders: 'Orders',
+      users: 'Users',
+    };
+
+    this.pageTitle = titles[root] ?? 'Store Management';
   }
 }

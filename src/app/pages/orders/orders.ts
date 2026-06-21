@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   PAYMENT_STATUS,
@@ -9,7 +9,8 @@ import {
   OrderFilterRequest,
 } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { RouterLink, Router } from '@angular/router';
 import { Pagination } from '../../components/pagination/pagination';
 import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
 import {
@@ -28,6 +29,8 @@ type PaymentStatusFilter = 'All' | PaymentStatus;
   styleUrl: './orders.css',
 })
 export class Orders implements OnInit {
+  authService = inject(AuthService);
+
   @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
 
   orders: OrderSummary[] = [];
@@ -102,6 +105,7 @@ export class Orders implements OnInit {
 
   constructor(
     private orderService: OrderService,
+    private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -292,5 +296,9 @@ export class Orders implements OnInit {
 
   clearFilters(): void {
     this.filterPanel?.onReset();
+  }
+
+  openOrder(orderId: number): void {
+    this.router.navigate(['/orders', orderId]);
   }
 }

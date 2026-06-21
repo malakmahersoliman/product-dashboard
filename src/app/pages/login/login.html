@@ -1,7 +1,9 @@
 <section class="login-page">
   <div class="login-card">
     <div class="login-brand">
-      <h2>Login</h2>
+      <span class="eyebrow">Store Management</span>
+      <h2>Welcome back</h2>
+      <p class="page-subtitle">Sign in to your POS dashboard</p>
     </div>
 
     <form class="form-stack" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
@@ -23,7 +25,7 @@
         }
       </div>
 
-      <button type="submit" [disabled]="isSubmitting">
+      <button type="submit" class="primary-btn login-submit" [disabled]="isSubmitting">
         @if (isSubmitting) {
           Logging in...
         } @else {

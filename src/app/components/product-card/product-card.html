@@ -91,8 +91,11 @@
 
     @if (authService.isSuperAdmin()) {
       <div class="admin-actions">
-        <a class="edit-btn" [routerLink]="['/products', product.id, 'edit']">Edit</a>
-        <button type="button" class="delete-btn" (click)="onDeleteClick()">Delete</button>
+        <span class="admin-actions-label">Manage</span>
+        <div class="admin-actions-buttons">
+          <a class="edit-btn" [routerLink]="['/products', product.id, 'edit']">Edit</a>
+          <button type="button" class="delete-btn" (click)="onDeleteClick()">Delete</button>
+        </div>
       </div>
     }
   </div>

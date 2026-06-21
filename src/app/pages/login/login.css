@@ -3,25 +3,37 @@
   display: grid;
   place-items: center;
   padding: 24px;
+  background: linear-gradient(160deg, #eef2ff 0%, var(--color-bg) 45%, #f8fafc 100%);
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  padding: 28px;
+  max-width: 420px;
+  padding: 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .login-brand h2 {
-  margin: 0 0 6px;
-  font-size: 24px;
+  margin: 0 0 4px;
+  font-size: 26px;
+  letter-spacing: -0.02em;
 }
 
-.login-brand p {
-  margin: 0 0 22px;
+.login-brand .page-subtitle {
+  margin: 0 0 24px;
 }
 
 .login-card .error-message {
   margin-top: 14px;
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px 16px;
 }
 
 .demo-credentials {

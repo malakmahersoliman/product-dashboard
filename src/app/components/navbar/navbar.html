@@ -15,6 +15,7 @@
 
       <nav class="sidebar-nav" aria-label="Main navigation">
         @if (authService.isSuperAdmin()) {
+          <span class="nav-section-label">Overview</span>
           <a routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebar()">
             <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -29,35 +30,23 @@
             Dashboard
           </a>
         }
-          @if (authService.isSuperAdmin()) {
-            <a routerLink="/categories" routerLinkActive="active" (click)="closeSidebar()">
-              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M4 6h16M4 12h16M4 18h16M7 6v12M17 6v12"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              Categories
-            </a>
-          }
-          @if (authService.isSuperAdmin()) {
-            <a routerLink="/users" routerLinkActive="active" (click)="closeSidebar()">
-              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M16 11a4 4 0 10-8 0 4 4 0 008 0zM4 19a8 8 0 0116 0"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-              </svg>
-              Users
-            </a>
-          }
+
+        <span class="nav-section-label">Catalog</span>
+        @if (authService.isSuperAdmin()) {
+          <a routerLink="/categories" routerLinkActive="active" (click)="closeSidebar()">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 6h16M4 12h16M4 18h16M7 6v12M17 6v12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Categories
+          </a>
+        }
         <a routerLink="/products" routerLinkActive="active" (click)="closeSidebar()">
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -71,8 +60,8 @@
           </svg>
           Products
         </a>
-        
 
+        <span class="nav-section-label">Sales</span>
         <a routerLink="/customers" routerLinkActive="active" (click)="closeSidebar()">
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -99,25 +88,38 @@
             <circle cx="9" cy="20" r="1.4" fill="currentColor" />
             <circle cx="18" cy="20" r="1.4" fill="currentColor" />
           </svg>
-          Cart
+          New Order
         </a>
 
+        <a routerLink="/orders" routerLinkActive="active" (click)="closeSidebar()">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M7 4h10l1 4H6l1-4zM5 8h14v11a1 1 0 01-1 1H6a1 1 0 01-1-1V8zM9 12h6M9 16h6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Orders
+        </a>
 
-          <a routerLink="/orders" routerLinkActive="active" (click)="closeSidebar()">
+        @if (authService.isSuperAdmin()) {
+          <span class="nav-section-label">Administration</span>
+          <a routerLink="/users" routerLinkActive="active" (click)="closeSidebar()">
             <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path
-                d="M7 4h10l1 4H6l1-4zM5 8h14v11a1 1 0 01-1 1H6a1 1 0 01-1-1V8zM9 12h6M9 16h6"
+                d="M16 11a4 4 0 10-8 0 4 4 0 008 0zM4 19a8 8 0 0116 0"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="1.8"
                 stroke-linecap="round"
-                stroke-linejoin="round"
               />
             </svg>
-            Orders
+            Users
           </a>
-          
-        
+        }
       </nav>
     </aside>
   }
@@ -142,7 +144,10 @@
               />
             </svg>
           </button>
-          <span class="topbar-title">Store Management</span>
+          <div class="topbar-heading">
+            <span class="topbar-eyebrow">Store Management</span>
+            <span class="topbar-title">{{ pageTitle }}</span>
+          </div>
         </div>
 
         <div class="topbar-actions">

@@ -1,25 +1,47 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
 import { UserTable } from '../../components/user-table/user-table';
+import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
+import {
+  FilterValues,
+  ListFilterField,
+  ListFilterSearchEvent,
+} from '../../components/list-filter-panel/list-filter-panel.model';
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, FormsModule, RouterLink, UserTable],
+  imports: [CommonModule, RouterLink, UserTable, ListFilterPanel],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })
 export class Users implements OnInit {
+  @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
+
   private readonly userService = inject(UserService);
 
   users = signal<User[]>([]);
   isLoading = signal(false);
   errorMessage = signal('');
-  searchTerm = signal('');
+  appliedSearchTerm = signal('');
+
+  readonly defaultUserFilterValues: FilterValues = {
+    search: '',
+  };
+
+  readonly userFilterFields: ListFilterField[] = [
+    {
+      key: 'search',
+      type: 'search',
+      label: 'Search',
+      chipLabel: 'Search',
+      placeholder: 'User #, email, or role...',
+      ariaLabel: 'Search users',
+    },
+  ];
 
   ngOnInit(): void {
     this.loadUsers();
@@ -41,12 +63,16 @@ export class Users implements OnInit {
     });
   }
 
-  onSearchChanged(value: string): void {
-    this.searchTerm.set(value);
+  onFilterSearch(event: ListFilterSearchEvent): void {
+    this.appliedSearchTerm.set(String(event.values['search'] ?? '').trim());
+  }
+
+  clearFilters(): void {
+    this.filterPanel?.onReset();
   }
 
   filteredUsers = computed(() => {
-    const term = this.searchTerm().trim().toLowerCase();
+    const term = this.appliedSearchTerm().toLowerCase();
 
     if (!term) {
       return this.users();

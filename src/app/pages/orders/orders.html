@@ -31,6 +31,8 @@
       [fields]="orderFilterFields"
       [initialValues]="defaultOrderFilterValues"
       [disabled]="isLoading"
+      [collapsible]="true"
+      refineLabel="Refine filters"
       (search)="onFilterSearch($event)"
     />
 
@@ -39,6 +41,9 @@
       <strong>{{ totalCount }}</strong> orders
       @if (totalPages > 0) {
         <span class="list-results-summary__page">· Page {{ pageNumber }} of {{ totalPages }}</span>
+      }
+      @if (!authService.isSuperAdmin()) {
+        <span class="list-results-summary__hint">· Click a row to view details</span>
       }
     </p>
 
@@ -73,14 +78,28 @@
                 <th>Items</th>
                 <th>Created</th>
                 <th>Payment</th>
-                <th>Actions</th>
+                @if (authService.isSuperAdmin()) {
+                  <th>Actions</th>
+                }
               </tr>
             </thead>
 
             <tbody>
               @for (order of orders; track order.id) {
-                <tr>
-                  <td><strong class="order-id">#{{ order.id }}</strong></td>
+                <tr
+                  class="row-clickable"
+                  (click)="openOrder(order.id)"
+                  [attr.aria-label]="'View order #' + order.id"
+                >
+                  <td>
+                    <a
+                      class="order-id-link"
+                      [routerLink]="['/orders', order.id]"
+                      (click)="$event.stopPropagation()"
+                    >
+                      #{{ order.id }}
+                    </a>
+                  </td>
                   <td>{{ order.customerName }}</td>
                   <td>
                     <span class="status-badge" [ngClass]="getStatusClass(order.status)">
@@ -95,43 +114,41 @@
                       {{ getPaymentStatusLabel(order.paymentStatus) }}
                     </span>
                   </td>
-                  <td>
-                    <div class="table-actions">
-                      <a class="action-btn action-btn--view" [routerLink]="['/orders', order.id]">
-                        View Details
-                      </a>
+                  @if (authService.isSuperAdmin()) {
+                    <td (click)="$event.stopPropagation()">
+                      <div class="table-actions table-actions--admin">
+                        @if (canComplete(order)) {
+                          <button
+                            type="button"
+                            class="action-btn action-btn--complete"
+                            (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)"
+                            [disabled]="updatingOrderId === order.id"
+                          >
+                            Complete
+                          </button>
+                        }
 
-                      @if (canComplete(order)) {
+                        @if (canCancel(order)) {
+                          <button
+                            type="button"
+                            class="action-btn action-btn--cancel"
+                            (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)"
+                            [disabled]="updatingOrderId === order.id"
+                          >
+                            Cancel
+                          </button>
+                        }
+
                         <button
                           type="button"
-                          class="action-btn action-btn--complete"
-                          (click)="onUpdateStatus(order.id, ORDER_STATUS.completed)"
-                          [disabled]="updatingOrderId === order.id"
+                          class="action-btn action-btn--delete"
+                          (click)="onDeleteOrder(order.id)"
                         >
-                          Mark Completed
+                          Delete
                         </button>
-                      }
-
-                      @if (canCancel(order)) {
-                        <button
-                          type="button"
-                          class="action-btn action-btn--cancel"
-                          (click)="onUpdateStatus(order.id, ORDER_STATUS.cancelled)"
-                          [disabled]="updatingOrderId === order.id"
-                        >
-                          Cancel
-                        </button>
-                      }
-
-                      <button
-                        type="button"
-                        class="action-btn action-btn--delete"
-                        (click)="onDeleteOrder(order.id)"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+                      </div>
+                    </td>
+                  }
                 </tr>
               }
             </tbody>
