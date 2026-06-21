@@ -1,59 +1,97 @@
-@if (totalPages > 0) {
+@if (totalCount > 0) {
   <div class="pagination-panel">
     <div class="pagination-summary">
-      <strong>{{ currentItemsCount }}</strong>
-      <span>{{ itemLabel }} on this page</span>
-      <span class="dot-separator">•</span>
-      <strong>{{ totalCount }}</strong>
-      <span>total matches</span>
+      <p class="pagination-summary__primary">
+        Showing <strong>{{ rangeStart }}-{{ rangeEnd }}</strong> of
+        <strong>{{ totalCount }}</strong> {{ itemLabel }}
+      </p>
+      <p class="pagination-summary__secondary">
+        Page <strong>{{ pageNumber }}</strong> of <strong>{{ totalPages }}</strong>
+      </p>
     </div>
 
-    <div class="pagination-actions">
-      <button
-        type="button"
-        class="secondary-btn pagination-nav-btn"
-        (click)="goToPreviousPage()"
-        [disabled]="pageNumber <= 1 || disabled"
-        aria-label="Previous page"
-      >
-        Previous
-      </button>
-
-      @if (showPageNumbers && visiblePages.length > 0) {
-        <div class="pagination-pages" role="group" aria-label="Page numbers">
-          @for (page of visiblePages; track $index) {
-            @if (isPageNumber(page)) {
-              <button
-                type="button"
-                class="pagination-page-btn"
-                [class.pagination-page-btn--active]="page === pageNumber"
-                (click)="goToPage(page)"
-                [disabled]="disabled"
-                [attr.aria-current]="page === pageNumber ? 'page' : null"
-                [attr.aria-label]="'Page ' + page"
-              >
-                {{ page }}
-              </button>
-            } @else {
-              <span class="pagination-ellipsis" aria-hidden="true">…</span>
-            }
+    <div class="pagination-controls">
+      <label class="pagination-page-size">
+        <span>{{ pageSizeLabel }}</span>
+        <select
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+          [disabled]="disabled"
+          aria-label="Rows per page"
+        >
+          @for (size of pageSizeOptions; track size) {
+            <option [ngValue]="size">{{ size }}</option>
           }
+        </select>
+      </label>
+
+      @if (totalPages > 1) {
+        <div class="pagination-actions">
+          <button
+            type="button"
+            class="secondary-btn pagination-nav-btn"
+            (click)="goToPreviousPage()"
+            [disabled]="pageNumber <= 1 || disabled"
+            aria-label="Previous page"
+          >
+            Previous
+          </button>
+
+          @if (showPageNumbers && visiblePages.length > 0) {
+            <div class="pagination-pages" role="group" aria-label="Page numbers">
+              @for (page of visiblePages; track $index) {
+                @if (isPageNumber(page)) {
+                  <button
+                    type="button"
+                    class="pagination-page-btn"
+                    [class.pagination-page-btn--active]="page === pageNumber"
+                    (click)="goToPage(page)"
+                    [disabled]="disabled"
+                    [attr.aria-current]="page === pageNumber ? 'page' : null"
+                    [attr.aria-label]="'Page ' + page"
+                  >
+                    {{ page }}
+                  </button>
+                } @else {
+                  <span class="pagination-ellipsis" aria-hidden="true">…</span>
+                }
+              }
+            </div>
+          }
+
+          <button
+            type="button"
+            class="secondary-btn pagination-nav-btn"
+            (click)="goToNextPage()"
+            [disabled]="pageNumber >= totalPages || disabled"
+            aria-label="Next page"
+          >
+            Next
+          </button>
         </div>
-      } @else {
-        <span class="pagination-info">
-          {{ totalPages === 0 ? 0 : pageNumber }} / {{ totalPages }}
-        </span>
       }
 
-      <button
-        type="button"
-        class="secondary-btn pagination-nav-btn"
-        (click)="goToNextPage()"
-        [disabled]="pageNumber >= totalPages || disabled"
-        aria-label="Next page"
-      >
-        Next
-      </button>
+      @if (showGoToPage) {
+        <form class="pagination-go-to" (submit)="$event.preventDefault(); onGoToPageSubmit()">
+          <label class="pagination-go-to__label">
+            <span>{{ goToPageLabel }}</span>
+            <input
+              type="number"
+              class="pagination-go-to__input"
+              min="1"
+              [max]="totalPages"
+              [(ngModel)]="goToPageInput"
+              name="goToPage"
+              [disabled]="disabled"
+              (keydown)="onGoToPageKeydown($event)"
+              aria-label="Go to page number"
+            />
+          </label>
+          <button type="submit" class="secondary-btn pagination-go-to__btn" [disabled]="disabled">
+            Go
+          </button>
+        </form>
+      }
     </div>
   </div>
 }

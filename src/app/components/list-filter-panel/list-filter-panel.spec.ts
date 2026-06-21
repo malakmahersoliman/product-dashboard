@@ -22,12 +22,19 @@ describe('ListFilterPanel', () => {
         label: 'Status',
         options: [
           { label: 'All', value: 'All' },
-          { label: 'Pending', value: 'Pending' },
+          { label: 'Pending', value: 'Pending', count: 4 },
         ],
       },
     ];
     component.initialValues = { search: '', status: 'All' };
-    component.defaultPageSize = 10;
+    component.ngOnChanges({
+      initialValues: {
+        currentValue: component.initialValues,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    });
     fixture.detectChanges();
   });
 
@@ -42,13 +49,12 @@ describe('ListFilterPanel', () => {
     expect(component.hasPendingChanges).toBe(true);
   });
 
-  it('should emit search when search button is clicked', () => {
+  it('should emit search when apply button is clicked', () => {
     const spy = vi.spyOn(component.search, 'emit');
     component.setDraftValue('search', 'order-1');
     component.onSearch();
     expect(spy).toHaveBeenCalledWith({
       values: { search: 'order-1', status: 'All' },
-      pageSize: 10,
     });
     expect(component.hasPendingChanges).toBe(false);
   });
@@ -80,5 +86,35 @@ describe('ListFilterPanel', () => {
 
     expect(component.getDraftValue('search')).toBe('pending query');
     expect(component.hasPendingChanges).toBe(true);
+  });
+
+  it('should build active chips for applied non-default filters', () => {
+    component.setDraftValue('search', 'widget');
+    component.setDraftValue('status', 'Pending');
+    component.onSearch();
+
+    expect(component.activeChips).toEqual([
+      { key: 'search', label: 'Search...', valueLabel: 'widget' },
+      { key: 'status', label: 'Status', valueLabel: 'Pending' },
+    ]);
+  });
+
+  it('should remove a chip and emit search immediately', () => {
+    const spy = vi.spyOn(component.search, 'emit');
+    component.setDraftValue('search', 'widget');
+    component.setDraftValue('status', 'Pending');
+    component.onSearch();
+
+    component.onRemoveChip('search');
+
+    expect(component.getDraftValue('search')).toBe('');
+    expect(spy).toHaveBeenLastCalledWith({
+      values: { search: '', status: 'Pending' },
+    });
+  });
+
+  it('should format option labels with counts', () => {
+    expect(component.formatOptionLabel({ label: 'Pending', count: 4 })).toBe('Pending (4)');
+    expect(component.formatOptionLabel({ label: 'All' })).toBe('All');
   });
 });

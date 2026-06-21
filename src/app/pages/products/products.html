@@ -1,5 +1,5 @@
-<section class="products-page page-container">
-  <div class="page-header products-header">
+<section class="products-page list-page page-container">
+  <div class="page-header list-page__header">
     <div>
       <span class="eyebrow">Inventory</span>
       <h2>Products</h2>
@@ -17,7 +17,7 @@
     <p class="success-message">{{ successMessage }}</p>
   }
 
-  @if (errorMessage && !isLoading) {
+  @if (errorMessage && !isLoading && products.length > 0) {
     <p class="error-message">{{ errorMessage }}</p>
   }
 
@@ -25,88 +25,84 @@
     <p class="error-message">{{ categoriesError }}</p>
   }
 
-  <div class="products-overview">
-    <article class="overview-card">
-      <span class="overview-label">Matching Products</span>
-      <strong class="overview-value">{{ totalCount }}</strong>
-      <span class="overview-hint">Based on current filters</span>
-    </article>
-
-    <article class="overview-card">
-      <span class="overview-label">Current Page</span>
-      <strong class="overview-value">{{ products.length }}</strong>
-      <span class="overview-hint">Items shown now</span>
-    </article>
-
-    <article class="overview-card overview-card--accent">
-      <span class="overview-label">Page</span>
-      <strong class="overview-value">{{ totalPages === 0 ? 0 : pageNumber }} / {{ totalPages }}</strong>
-    </article>
-  </div>
-
-  <app-list-filter-panel
-    title="Find products"
-    subtitle="Adjust filters and sorting, then click Search to update results."
-    [fields]="productFilterFields"
-    [initialValues]="defaultProductFilterValues"
-    [defaultPageSize]="10"
-    [pageSizeOptions]="[6, 10, 12, 20]"
-    [disabled]="isLoading"
-    (search)="onFilterSearch($event)"
-  />
-
-  <div class="results-header">
-    <div>
-      <h3>Product Catalog</h3>
-      <p>
-        Showing <strong>{{ products.length }}</strong>
-        of <strong>{{ totalCount }}</strong> products
-      </p>
-    </div>
-
-    @if (totalPages > 0) {
-      <span class="page-pill">
-        Page {{ pageNumber }} of {{ totalPages }}
-      </span>
-    }
-  </div>
-
   @if (isLoading) {
     <div class="loading-block products-loading">
       <span class="spinner"></span>
       <span>Loading products...</span>
     </div>
-  } @else if (products.length === 0) {
+  } @else if (errorMessage && products.length === 0 && !hasActiveFilters) {
+    <p class="error-message">{{ errorMessage }}</p>
+  } @else if (totalCount === 0 && !hasActiveFilters) {
     <div class="empty-state products-empty">
-      <h3>No products found</h3>
-      <p>Try changing your search, filters, or page size.</p>
+      <h3>No products yet</h3>
+      <p>Add your first product to start building the catalog.</p>
 
-      <div class="empty-actions">
+      <div class="empty-state-actions">
         @if (authService.isSuperAdmin()) {
           <a class="primary-btn" routerLink="/products/new">Add Product</a>
         }
       </div>
     </div>
   } @else {
-    <div class="products-grid">
-      @for (product of products; track product.id) {
-        <app-product-card
-          [product]="product"
-          (deleteProduct)="onDeleteProduct($event)"
-        ></app-product-card>
-      }
-    </div>
-  }
-
-  @if (!isLoading && totalPages > 1) {
-    <app-pagination
-      [pageNumber]="pageNumber"
-      [totalPages]="totalPages"
-      [totalCount]="totalCount"
-      [currentItemsCount]="products.length"
+    <app-list-filter-panel
+      [fields]="productFilterFields"
+      [initialValues]="defaultProductFilterValues"
       [disabled]="isLoading"
-      itemLabel="products"
-      (pageChange)="onPageChange($event)"
+      (search)="onFilterSearch($event)"
     />
+
+    <p class="list-results-summary">
+      Showing <strong>{{ rangeStart }}-{{ rangeEnd }}</strong> of
+      <strong>{{ totalCount }}</strong> products
+      @if (totalPages > 0) {
+        <span class="list-results-summary__page">· Page {{ pageNumber }} of {{ totalPages }}</span>
+      }
+    </p>
+
+    @if (totalCount === 0 && hasActiveFilters) {
+      <div class="empty-state empty-state--filtered">
+        <h3>No products match your filters</h3>
+        <p>Try broadening your search or removing one or more filters.</p>
+
+        <ul class="empty-state-suggestions">
+          <li>Clear the search term or try a shorter keyword</li>
+          <li>Set category, availability, or stock filters back to "All"</li>
+          <li>Reset sorting to Name A-Z</li>
+        </ul>
+
+        <div class="empty-state-actions">
+          <button type="button" class="primary-btn" (click)="clearFilters()">
+            Clear filters
+          </button>
+          @if (authService.isSuperAdmin()) {
+            <a class="secondary-btn" routerLink="/products/new">Add Product</a>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (product of products; track product.id) {
+          <app-product-card
+            [product]="product"
+            (deleteProduct)="onDeleteProduct($event)"
+          ></app-product-card>
+        }
+      </div>
+    }
+
+    @if (totalCount > 0) {
+      <app-pagination
+        [pageNumber]="pageNumber"
+        [totalPages]="totalPages"
+        [totalCount]="totalCount"
+        [pageSize]="pageSize"
+        [currentItemsCount]="products.length"
+        [pageSizeOptions]="pageSizeOptions"
+        [disabled]="isLoading"
+        itemLabel="products"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      />
+    }
   }
 </section>

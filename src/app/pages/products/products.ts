@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -23,6 +23,8 @@ import { Category } from '../../models/category.model';
   styleUrl: './products.css',
 })
 export class Products implements OnInit {
+  @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
+
   products: Product[] = [];
   categories: Category[] = [];
 
@@ -39,18 +41,20 @@ export class Products implements OnInit {
   selectedStockStatus = '';
 
   pageNumber = 1;
-  pageSize = 10;
+  pageSize = 20;
   totalCount = 0;
   totalPages = 0;
 
   sortBy = 'name';
   sortDirection = 'asc';
 
+  readonly pageSizeOptions = [10, 20, 50];
+
   readonly defaultProductFilterValues: FilterValues = {
     search: '',
     categoryId: null,
-    availability: null,
-    stockStatus: '',
+    availability: 'All',
+    stockStatus: 'All',
     sort: 'name:asc',
   };
 
@@ -58,8 +62,33 @@ export class Products implements OnInit {
     {
       key: 'search',
       type: 'search',
-      placeholder: 'Search by product name or category...',
+      label: 'Search',
+      chipLabel: 'Search',
+      placeholder: 'Product name or category...',
       ariaLabel: 'Search products',
+    },
+    {
+      key: 'availability',
+      type: 'button-group',
+      label: 'Availability',
+      groupLabel: 'Filter by availability',
+      options: [
+        { label: 'All', value: 'All' },
+        { label: 'Available', value: true },
+        { label: 'Unavailable', value: false },
+      ],
+    },
+    {
+      key: 'stockStatus',
+      type: 'button-group',
+      label: 'Stock',
+      groupLabel: 'Filter by stock level',
+      options: [
+        { label: 'All', value: 'All' },
+        { label: 'In stock', value: 'inStock' },
+        { label: 'Low stock', value: 'lowStock' },
+        { label: 'Out of stock', value: 'outOfStock' },
+      ],
     },
     {
       key: 'categoryId',
@@ -67,27 +96,6 @@ export class Products implements OnInit {
       label: 'Category',
       disabled: true,
       options: [{ label: 'Loading categories...', value: null }],
-    },
-    {
-      key: 'availability',
-      type: 'select',
-      label: 'Availability',
-      options: [
-        { label: 'All availability', value: null },
-        { label: 'Available', value: true },
-        { label: 'Unavailable', value: false },
-      ],
-    },
-    {
-      key: 'stockStatus',
-      type: 'select',
-      label: 'Stock',
-      options: [
-        { label: 'All stock', value: '' },
-        { label: 'In stock', value: 'inStock' },
-        { label: 'Low stock', value: 'lowStock' },
-        { label: 'Out of stock', value: 'outOfStock' },
-      ],
     },
     {
       key: 'sort',
@@ -121,6 +129,32 @@ export class Products implements OnInit {
     this.handleOrderPlacedMessage();
     this.loadCategories();
     this.loadProducts();
+  }
+
+  get hasActiveFilters(): boolean {
+    return (
+      !!this.searchTerm.trim() ||
+      this.selectedCategoryId !== null ||
+      this.selectedAvailability !== null ||
+      !!this.selectedStockStatus ||
+      `${this.sortBy}:${this.sortDirection}` !== 'name:asc'
+    );
+  }
+
+  get rangeStart(): number {
+    if (this.totalCount === 0) {
+      return 0;
+    }
+
+    return (this.pageNumber - 1) * this.pageSize + 1;
+  }
+
+  get rangeEnd(): number {
+    if (this.totalCount === 0) {
+      return 0;
+    }
+
+    return Math.min(this.pageNumber * this.pageSize, this.totalCount);
   }
 
   handleOrderPlacedMessage(): void {
@@ -198,15 +232,19 @@ export class Products implements OnInit {
   onFilterSearch(event: ListFilterSearchEvent): void {
     this.searchTerm = String(event.values['search'] ?? '');
     this.selectedCategoryId = event.values['categoryId'] as number | null;
-    this.selectedAvailability = event.values['availability'] as boolean | null;
-    this.selectedStockStatus = String(event.values['stockStatus'] ?? '');
+
+    const availability = event.values['availability'];
+    this.selectedAvailability =
+      availability === 'All' ? null : (availability as boolean | null);
+
+    const stockStatus = event.values['stockStatus'];
+    this.selectedStockStatus = stockStatus === 'All' ? '' : String(stockStatus ?? '');
 
     const sortValue = String(event.values['sort'] ?? 'name:asc');
     const [sortBy, sortDirection] = sortValue.split(':');
     this.sortBy = sortBy;
     this.sortDirection = sortDirection;
 
-    this.pageSize = event.pageSize;
     this.pageNumber = 1;
     this.loadProducts();
   }
@@ -214,6 +252,16 @@ export class Products implements OnInit {
   onPageChange(pageNumber: number): void {
     this.pageNumber = pageNumber;
     this.loadProducts();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pageSize = pageSize;
+    this.pageNumber = 1;
+    this.loadProducts();
+  }
+
+  clearFilters(): void {
+    this.filterPanel?.onReset();
   }
 
   private updateCategoryFilterOptions(): void {

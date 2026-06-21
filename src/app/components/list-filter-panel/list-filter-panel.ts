@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
+  ActiveFilterChip,
   FilterFieldValue,
   FilterValues,
   ListFilterField,
@@ -17,27 +18,26 @@ import {
 export class ListFilterPanel implements OnChanges {
   @Input({ required: true }) fields: ListFilterField[] = [];
   @Input({ required: true }) initialValues!: FilterValues;
-  @Input() title = 'Filters';
-  @Input() subtitle = 'Adjust filters, then click Search to apply.';
-  @Input() searchLabel = 'Search';
+  @Input() title = '';
+  @Input() subtitle = '';
+  @Input() searchLabel = 'Apply';
   @Input() resetLabel = 'Reset';
-  @Input() defaultPageSize = 10;
-  @Input() pageSizeOptions: number[] = [5, 10, 20];
-  @Input() pageSizeLabel = 'Page size';
+  @Input() activeFiltersLabel = 'Filtered by';
+  @Input() clearAllLabel = 'Clear all';
   @Input() disabled = false;
+  @Input() collapsible = false;
+  @Input() refineLabel = 'More filters';
 
   @Output() search = new EventEmitter<ListFilterSearchEvent>();
   @Output() reset = new EventEmitter<ListFilterSearchEvent>();
 
   draftValues: FilterValues = {};
-  draftPageSize = 10;
+  filtersExpanded = false;
 
   private appliedValues: FilterValues = {};
-  private appliedPageSize = 10;
 
   ngOnChanges(changes: SimpleChanges): void {
     const initialValuesChange = changes['initialValues'];
-    const defaultPageSizeChange = changes['defaultPageSize'];
 
     const initialValuesChanged =
       !!initialValuesChange &&
@@ -47,40 +47,50 @@ export class ListFilterPanel implements OnChanges {
           initialValuesChange.previousValue
         ));
 
-    if (initialValuesChanged || defaultPageSizeChange?.firstChange) {
+    if (initialValuesChanged) {
       this.syncDraftFromInitial();
-      return;
+      this.filtersExpanded = this.collapsible && this.hasActiveAppliedFilters;
     }
+  }
 
-    if (
-      defaultPageSizeChange &&
-      defaultPageSizeChange.previousValue !== defaultPageSizeChange.currentValue
-    ) {
-      this.draftPageSize = this.defaultPageSize;
-      this.appliedPageSize = this.defaultPageSize;
-    }
+  get showHeader(): boolean {
+    return !!this.title.trim();
   }
 
   get searchFields(): ListFilterField[] {
     return this.fields.filter((field) => field.type === 'search');
   }
 
+  get refineFields(): ListFilterField[] {
+    return this.fields.filter((field) => field.type !== 'search');
+  }
+
   get selectFields(): ListFilterField[] {
-    return this.fields.filter((field) => field.type === 'select');
+    return this.refineFields.filter((field) => field.type === 'select');
   }
 
   get buttonGroupFields(): ListFilterField[] {
-    return this.fields.filter((field) => field.type === 'button-group');
+    return this.refineFields.filter((field) => field.type === 'button-group');
   }
 
   get hasPendingChanges(): boolean {
-    if (this.draftPageSize !== this.appliedPageSize) {
-      return true;
-    }
-
     return this.fields.some(
       (field) => this.draftValues[field.key] !== this.appliedValues[field.key]
     );
+  }
+
+  get activeChips(): ActiveFilterChip[] {
+    return this.fields
+      .filter((field) => !this.isDefaultValue(field.key, this.appliedValues[field.key]))
+      .map((field) => ({
+        key: field.key,
+        label: this.getChipLabel(field),
+        valueLabel: this.getValueLabel(field, this.appliedValues[field.key]),
+      }));
+  }
+
+  get hasActiveAppliedFilters(): boolean {
+    return this.activeChips.length > 0;
   }
 
   getDraftValue(key: string): FilterFieldValue {
@@ -95,18 +105,25 @@ export class ListFilterPanel implements OnChanges {
     return this.getDraftValue(field.key) === value;
   }
 
+  formatOptionLabel(option: { label: string; count?: number }): string {
+    if (option.count === undefined || option.count === null) {
+      return option.label;
+    }
+
+    return `${option.label} (${option.count})`;
+  }
+
+  toggleFiltersExpanded(): void {
+    this.filtersExpanded = !this.filtersExpanded;
+  }
+
   onSearch(): void {
     if (this.disabled) {
       return;
     }
 
     this.appliedValues = { ...this.draftValues };
-    this.appliedPageSize = this.draftPageSize;
-
-    this.search.emit({
-      values: this.appliedValues,
-      pageSize: this.appliedPageSize,
-    });
+    this.search.emit({ values: this.appliedValues });
   }
 
   onReset(): void {
@@ -116,15 +133,28 @@ export class ListFilterPanel implements OnChanges {
 
     this.syncDraftFromInitial();
     this.appliedValues = { ...this.draftValues };
-    this.appliedPageSize = this.draftPageSize;
 
     const event: ListFilterSearchEvent = {
       values: this.appliedValues,
-      pageSize: this.appliedPageSize,
     };
 
     this.reset.emit(event);
     this.search.emit(event);
+  }
+
+  onClearAll(): void {
+    this.onReset();
+  }
+
+  onRemoveChip(key: string): void {
+    if (this.disabled) {
+      return;
+    }
+
+    const defaultValue = this.initialValues[key] ?? null;
+    this.draftValues[key] = defaultValue;
+    this.appliedValues[key] = defaultValue;
+    this.search.emit({ values: { ...this.appliedValues } });
   }
 
   onSearchKeydown(event: KeyboardEvent): void {
@@ -136,9 +166,29 @@ export class ListFilterPanel implements OnChanges {
 
   private syncDraftFromInitial(): void {
     this.draftValues = { ...this.initialValues };
-    this.draftPageSize = this.defaultPageSize;
     this.appliedValues = { ...this.draftValues };
-    this.appliedPageSize = this.draftPageSize;
+  }
+
+  private getChipLabel(field: ListFilterField): string {
+    return field.chipLabel ?? field.label ?? field.placeholder ?? field.key;
+  }
+
+  private isDefaultValue(key: string, value: FilterFieldValue | undefined): boolean {
+    const defaultValue = this.initialValues[key] ?? null;
+    return value === defaultValue;
+  }
+
+  private getValueLabel(field: ListFilterField, value: FilterFieldValue | undefined): string {
+    if (value === null || value === undefined || value === '') {
+      return '';
+    }
+
+    const option = field.options?.find((entry) => entry.value === value);
+    if (option) {
+      return option.label;
+    }
+
+    return String(value);
   }
 
   private areFilterValuesEqual(

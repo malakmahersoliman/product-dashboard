@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   PAYMENT_STATUS,
@@ -28,6 +28,8 @@ type PaymentStatusFilter = 'All' | PaymentStatus;
   styleUrl: './orders.css',
 })
 export class Orders implements OnInit {
+  @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
+
   orders: OrderSummary[] = [];
   searchTerm = '';
   statusFilter: StatusFilter = 'All';
@@ -35,7 +37,7 @@ export class Orders implements OnInit {
   customerNameFilter = '';
 
   pageNumber = 1;
-  pageSize = 10;
+  pageSize = 20;
   totalCount = 0;
   totalPages = 0;
 
@@ -44,6 +46,8 @@ export class Orders implements OnInit {
   PAYMENT_STATUS = PAYMENT_STATUS;
   errorMessage: string | null = null;
   updatingOrderId: number | null = null;
+
+  readonly pageSizeOptions = [10, 20, 50];
 
   readonly defaultOrderFilterValues: FilterValues = {
     search: '',
@@ -56,13 +60,17 @@ export class Orders implements OnInit {
     {
       key: 'search',
       type: 'search',
-      placeholder: 'Search by order #...',
+      label: 'Order #',
+      chipLabel: 'Order #',
+      placeholder: 'e.g. 1042',
       ariaLabel: 'Search by order number',
     },
     {
       key: 'customerName',
       type: 'search',
-      placeholder: 'Search by full customer name...',
+      label: 'Customer',
+      chipLabel: 'Customer',
+      placeholder: 'Full name',
       ariaLabel: 'Search by customer name',
     },
     {
@@ -101,22 +109,6 @@ export class Orders implements OnInit {
     this.loadOrders();
   }
 
-  get totalOrdersCount(): number {
-    return this.totalCount;
-  }
-
-  get pendingCount(): number {
-    return this.orders.filter((o) => o.status === ORDER_STATUS.pending).length;
-  }
-
-  get completedCount(): number {
-    return this.orders.filter((o) => o.status === ORDER_STATUS.completed).length;
-  }
-
-  get cancelledCount(): number {
-    return this.orders.filter((o) => o.status === ORDER_STATUS.cancelled).length;
-  }
-
   get hasActiveFilters(): boolean {
     return (
       !!this.searchTerm.trim() ||
@@ -126,12 +118,27 @@ export class Orders implements OnInit {
     );
   }
 
+  get rangeStart(): number {
+    if (this.totalCount === 0) {
+      return 0;
+    }
+
+    return (this.pageNumber - 1) * this.pageSize + 1;
+  }
+
+  get rangeEnd(): number {
+    if (this.totalCount === 0) {
+      return 0;
+    }
+
+    return Math.min(this.pageNumber * this.pageSize, this.totalCount);
+  }
+
   onFilterSearch(event: ListFilterSearchEvent): void {
     this.searchTerm = String(event.values['search'] ?? '');
     this.customerNameFilter = String(event.values['customerName'] ?? '');
     this.statusFilter = event.values['status'] as StatusFilter;
     this.paymentStatusFilter = event.values['paymentStatus'] as PaymentStatusFilter;
-    this.pageSize = event.pageSize;
     this.pageNumber = 1;
     this.loadOrders();
   }
@@ -275,5 +282,15 @@ export class Orders implements OnInit {
   onPageChange(pageNumber: number): void {
     this.pageNumber = pageNumber;
     this.loadOrders();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.pageSize = pageSize;
+    this.pageNumber = 1;
+    this.loadOrders();
+  }
+
+  clearFilters(): void {
+    this.filterPanel?.onReset();
   }
 }

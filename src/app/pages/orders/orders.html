@@ -1,6 +1,7 @@
-<section class="orders-page page-container">
-  <div class="page-header">
+<section class="orders-page list-page page-container">
+  <div class="page-header list-page__header">
     <div>
+      <span class="eyebrow">Sales</span>
       <h2>Orders</h2>
       <p class="page-subtitle">View and manage customer orders</p>
     </div>
@@ -17,7 +18,7 @@
       <span class="spinner"></span>
       <span>Loading orders...</span>
     </div>
-  } @else if (errorMessage && orders.length === 0) {
+  } @else if (errorMessage && orders.length === 0 && !hasActiveFilters) {
     <p class="error-message">{{ errorMessage }}</p>
   } @else if (totalCount === 0 && !hasActiveFilters) {
     <div class="empty-state">
@@ -27,23 +28,37 @@
     </div>
   } @else {
     <app-list-filter-panel
-      title="Find orders"
-      subtitle="Adjust filters, then click Search to update results."
       [fields]="orderFilterFields"
       [initialValues]="defaultOrderFilterValues"
-      [defaultPageSize]="10"
-      [pageSizeOptions]="[5, 10, 20]"
       [disabled]="isLoading"
       (search)="onFilterSearch($event)"
     />
 
-    <p class="result-count">
-      Showing {{ orders.length }} of {{ totalCount }} orders
+    <p class="list-results-summary">
+      Showing <strong>{{ rangeStart }}-{{ rangeEnd }}</strong> of
+      <strong>{{ totalCount }}</strong> orders
+      @if (totalPages > 0) {
+        <span class="list-results-summary__page">· Page {{ pageNumber }} of {{ totalPages }}</span>
+      }
     </p>
 
-    @if (orders.length === 0) {
-      <div class="empty-state empty-filter">
-        <p>No orders match your search or filter.</p>
+    @if (totalCount === 0 && hasActiveFilters) {
+      <div class="empty-state empty-state--filtered">
+        <h3>No orders match your filters</h3>
+        <p>Try broadening your search or removing one or more filters.</p>
+
+        <ul class="empty-state-suggestions">
+          <li>Clear the order number or customer name search</li>
+          <li>Set order or payment status back to "All"</li>
+          <li>Check for typos in the order number</li>
+        </ul>
+
+        <div class="empty-state-actions">
+          <button type="button" class="primary-btn" (click)="clearFilters()">
+            Clear filters
+          </button>
+          <a class="secondary-btn" routerLink="/cart">Create Order</a>
+        </div>
       </div>
     } @else {
       <div class="orders-table-panel">
@@ -76,16 +91,15 @@
                   <td>{{ itemCount(order) }}</td>
                   <td class="date-cell">{{ formatDate(order.orderDate) }}</td>
                   <td>
-                <span [class]="getPaymentStatusClass(order.paymentStatus)">
-                  {{ getPaymentStatusLabel(order.paymentStatus) }}
-                </span>
-              </td>
+                    <span [class]="getPaymentStatusClass(order.paymentStatus)">
+                      {{ getPaymentStatusLabel(order.paymentStatus) }}
+                    </span>
+                  </td>
                   <td>
                     <div class="table-actions">
                       <a class="action-btn action-btn--view" [routerLink]="['/orders', order.id]">
                         View Details
                       </a>
-                  
 
                       @if (canComplete(order)) {
                         <button
@@ -126,15 +140,18 @@
       </div>
     }
 
-    @if (totalPages > 1) {
+    @if (totalCount > 0) {
       <app-pagination
         [pageNumber]="pageNumber"
         [totalPages]="totalPages"
         [totalCount]="totalCount"
+        [pageSize]="pageSize"
         [currentItemsCount]="orders.length"
+        [pageSizeOptions]="pageSizeOptions"
         [disabled]="isLoading"
         itemLabel="orders"
         (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
       />
     }
   }
