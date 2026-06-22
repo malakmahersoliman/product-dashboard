@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CustomerService } from '../../services/customer.service';
-import { Customer, CustomerRequest } from '../../models/customer.model';
-import { Router, RouterLink } from '@angular/router';
+import { Customer } from '../../models/customer.model';
+import { AuthService } from '../../services/auth.service';
+import { RouterLink } from '@angular/router';
 import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
 import {
   FilterValues,
@@ -16,7 +16,7 @@ import {
 
 @Component({
   selector: 'app-customers',
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ListFilterPanel],
+  imports: [CommonModule, RouterLink, ListFilterPanel],
   templateUrl: './customers.html',
   styleUrl: './customers.css',
 })
@@ -24,7 +24,7 @@ export class Customers implements OnInit {
   @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
 
   private readonly customerService = inject(CustomerService);
-  private readonly fb = inject(FormBuilder);
+  authService = inject(AuthService);
 
   customers = signal<Customer[]>([]);
   isLoading = signal(false);
@@ -32,8 +32,6 @@ export class Customers implements OnInit {
 
   errorMessage = signal('');
   successMessage = signal('');
-
-  editingCustomerId = signal<number | null>(null);
 
   readonly defaultCustomerFilterValues: FilterValues = {
     search: '',
@@ -49,11 +47,6 @@ export class Customers implements OnInit {
       ariaLabel: 'Search customers',
     },
   ];
-
-  customerForm = this.fb.group({
-    name: ['', [Validators.required, Validators.maxLength(100)]],
-    email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
-  });
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -101,14 +94,6 @@ export class Customers implements OnInit {
     });
   }
   
-  private buildRequest(): CustomerRequest {
-    const formValue = this.customerForm.getRawValue();
-
-    return {
-      name: formValue.name?.trim() ?? '',
-      email: formValue.email?.trim() ?? '',
-    };
-  }
   onFilterSearch(event: ListFilterSearchEvent): void {
     this.appliedSearchTerm.set(String(event.values['search'] ?? '').trim());
   }

@@ -124,6 +124,7 @@ export class Navbar implements OnInit, OnDestroy {
       customers: 'Customers',
       cart: 'New Order',
       orders: 'Orders',
+      reports: 'Reports',
       users: 'Users',
     };
 

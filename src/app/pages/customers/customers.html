@@ -100,13 +100,15 @@
                         Edit
                       </a>
 
-                      <button
-                        type="button"
-                        class="action-btn action-btn--delete"
-                        (click)="deleteCustomer(customer.id)"
-                      >
-                        Delete
-                      </button>
+                      @if (authService.isSuperAdmin()) {
+                        <button
+                          type="button"
+                          class="action-btn action-btn--delete"
+                          (click)="deleteCustomer(customer.id)"
+                        >
+                          Delete
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>

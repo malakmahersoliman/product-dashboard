@@ -9,7 +9,7 @@
     <form class="form-stack" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div>
         <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="admin@test.com" />
+        <input id="email" type="email" formControlName="email" placeholder="admin@store.com" />
 
         @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
           <small>Please enter a valid email.</small>

@@ -1312,3 +1312,27 @@ textarea:focus:not(:focus-visible) {
     font-size: 24px;
   }
 }
+
+@media print {
+  body {
+    background: white;
+  }
+
+  app-navbar .sidebar,
+  app-navbar .sidebar-backdrop,
+  app-navbar .topbar {
+    display: none !important;
+  }
+
+  app-navbar .main-content,
+  app-navbar .main-column {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

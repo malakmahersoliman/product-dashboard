@@ -7,6 +7,7 @@
           <th>Email</th>
           <th>Role</th>
           <th>Created</th>
+          <th>Actions</th>
         </tr>
       </thead>
 
@@ -29,6 +30,25 @@
             </td>
 
             <td class="date-cell">{{ user.createdAt | date: 'mediumDate' }}</td>
+
+            <td>
+              <div class="table-actions">
+                <a
+                  class="action-btn action-btn--edit"
+                  [routerLink]="['/users', user.id, 'edit']"
+                >
+                  Edit
+                </a>
+
+                <button
+                  type="button"
+                  class="action-btn action-btn--delete"
+                  (click)="deleteUser.emit(user.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
           </tr>
         }
       </tbody>

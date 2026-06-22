@@ -1,30 +1,54 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Category, CategoryRequest } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
+import { ListFilterPanel } from '../../components/list-filter-panel/list-filter-panel';
+import {
+  FilterValues,
+  ListFilterField,
+  ListFilterSearchEvent,
+} from '../../components/list-filter-panel/list-filter-panel.model';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ListFilterPanel],
   templateUrl: './categories.html',
   styleUrl: './categories.css',
 })
 export class Categories implements OnInit {
+  @ViewChild(ListFilterPanel) filterPanel?: ListFilterPanel;
+
   private readonly categoryService = inject(CategoryService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   categories: Category[] = [];
-  searchTerm = '';
+  appliedSearchTerm = '';
 
   isLoading = false;
   isSaving = false;
+  formOpen = false;
   errorMessage = '';
   successMessage = '';
 
   editingCategoryId: number | null = null;
+
+  readonly defaultCategoryFilterValues: FilterValues = {
+    search: '',
+  };
+
+  readonly categoryFilterFields: ListFilterField[] = [
+    {
+      key: 'search',
+      type: 'search',
+      label: 'Search',
+      chipLabel: 'Search',
+      placeholder: 'Name or description...',
+      ariaLabel: 'Search categories',
+    },
+  ];
 
   form: CategoryRequest = {
     name: '',
@@ -35,21 +59,34 @@ export class Categories implements OnInit {
     this.loadCategories();
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.formOpen && !this.isSaving) {
+      this.closeForm();
+    }
+  }
+
   get filteredCategories(): Category[] {
-    const term = this.searchTerm.trim().toLowerCase();
+    const term = this.appliedSearchTerm.trim().toLowerCase();
 
     if (!term) {
       return this.categories;
     }
 
-    return this.categories.filter(category =>
-      category.name.toLowerCase().includes(term) ||
-      (category.description ?? '').toLowerCase().includes(term)
+    return this.categories.filter(
+      (category) =>
+        category.name.toLowerCase().includes(term) ||
+        (category.description ?? '').toLowerCase().includes(term)
     );
   }
 
-  get totalCategories(): number {
-    return this.categories.length;
+  onFilterSearch(event: ListFilterSearchEvent): void {
+    this.appliedSearchTerm = String(event.values['search'] ?? '').trim();
+    this.cdr.markForCheck();
+  }
+
+  clearFilters(): void {
+    this.filterPanel?.onReset();
   }
 
   get isEditing(): boolean {
@@ -63,7 +100,7 @@ export class Categories implements OnInit {
     this.cdr.markForCheck();
 
     this.categoryService.getCategories().subscribe({
-      next: categories => {
+      next: (categories) => {
         this.categories = categories;
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -74,6 +111,17 @@ export class Categories implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  openCreateForm(): void {
+    this.editingCategoryId = null;
+    this.form = {
+      name: '',
+      description: '',
+    };
+    this.errorMessage = '';
+    this.formOpen = true;
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
@@ -100,11 +148,15 @@ export class Categories implements OnInit {
     };
 
     this.errorMessage = '';
-    this.successMessage = '';
+    this.formOpen = true;
     this.cdr.markForCheck();
   }
 
-  cancelEdit(): void {
+  closeForm(): void {
+    if (this.isSaving) {
+      return;
+    }
+
     this.resetForm();
   }
 
@@ -121,7 +173,7 @@ export class Categories implements OnInit {
 
     this.categoryService.deleteCategory(category.id).subscribe({
       next: () => {
-        this.categories = this.categories.filter(c => c.id !== category.id);
+        this.categories = this.categories.filter((c) => c.id !== category.id);
         this.successMessage = 'Category deleted successfully.';
 
         if (this.editingCategoryId === category.id) {
@@ -140,11 +192,10 @@ export class Categories implements OnInit {
   private createCategory(request: CategoryRequest): void {
     this.isSaving = true;
     this.errorMessage = '';
-    this.successMessage = '';
     this.cdr.markForCheck();
 
     this.categoryService.createCategory(request).subscribe({
-      next: category => {
+      next: (category) => {
         this.categories = [...this.categories, category].sort((a, b) =>
           a.name.localeCompare(b.name)
         );
@@ -165,13 +216,12 @@ export class Categories implements OnInit {
   private updateCategory(id: number, request: CategoryRequest): void {
     this.isSaving = true;
     this.errorMessage = '';
-    this.successMessage = '';
     this.cdr.markForCheck();
 
     this.categoryService.updateCategory(id, request).subscribe({
-      next: updatedCategory => {
+      next: (updatedCategory) => {
         this.categories = this.categories
-          .map(category =>
+          .map((category) =>
             category.id === updatedCategory.id ? updatedCategory : category
           )
           .sort((a, b) => a.name.localeCompare(b.name));
@@ -198,6 +248,7 @@ export class Categories implements OnInit {
 
   private resetForm(clearMessages = true): void {
     this.editingCategoryId = null;
+    this.formOpen = false;
     this.form = {
       name: '',
       description: '',

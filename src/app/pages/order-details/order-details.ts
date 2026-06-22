@@ -98,7 +98,15 @@ export class OrderDetails implements OnInit {
   }
 
   onUpdateStatus(status: OrderStatus): void {
-    if (!this.order || !this.canComplete()) {
+    if (!this.order) {
+      return;
+    }
+
+    if (status === ORDER_STATUS.completed && !this.canComplete()) {
+      return;
+    }
+
+    if (status === ORDER_STATUS.cancelled && !this.canCancel()) {
       return;
     }
 

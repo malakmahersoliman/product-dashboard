@@ -1,0 +1,144 @@
+<section class="report-page page-container">
+  <div class="page-header no-print">
+    <div>
+      <span class="eyebrow">Sales</span>
+      <h2>Reports</h2>
+      <p class="page-subtitle">Generate historical sales reports for a selected date range</p>
+    </div>
+  </div>
+
+  <div class="report-controls no-print">
+    <div class="report-date-fields">
+      <label class="form-field report-date-field">
+        <span>From</span>
+        <input type="date" [(ngModel)]="fromDate" [disabled]="isLoading" />
+      </label>
+
+      <label class="form-field report-date-field">
+        <span>To</span>
+        <input type="date" [(ngModel)]="toDate" [disabled]="isLoading" />
+      </label>
+    </div>
+
+    <div class="report-actions">
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="generateReport()"
+        [disabled]="isLoading"
+      >
+        @if (isLoading) {
+          Generating...
+        } @else {
+          Generate Report
+        }
+      </button>
+
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="printReport()"
+        [disabled]="!report || isLoading"
+      >
+        Print
+      </button>
+    </div>
+  </div>
+
+  @if (validationMessage) {
+    <p class="error-message no-print">{{ validationMessage }}</p>
+  }
+
+  @if (isLoading) {
+    <div class="loading-block no-print">
+      <span class="spinner"></span>
+      <span>Generating report...</span>
+    </div>
+  } @else if (errorMessage) {
+    <div class="error-card no-print">
+      <p class="error-message">{{ errorMessage }}</p>
+      <button type="button" class="primary-btn" (click)="generateReport()">Try Again</button>
+    </div>
+  } @else if (report; as data) {
+    <div class="report-document">
+      <header class="report-print-header">
+        <div>
+          <p class="report-company">Store Management</p>
+          <h3 class="report-title">Sales Report</h3>
+        </div>
+        <div class="report-meta">
+          <p>
+            <span class="report-meta-label">Period</span>
+            {{ formatReportDate(data.from) }} – {{ formatReportDate(data.to) }}
+          </p>
+          @if (generatedAt; as generated) {
+            <p class="report-generated print-only">
+              <span class="report-meta-label">Generated</span>
+              {{ formatGeneratedAt(generated) }}
+            </p>
+          }
+        </div>
+      </header>
+
+      <div class="stats-grid report-summary">
+        <article class="stat-card">
+          <span class="stat-label">Total Orders</span>
+          <strong class="stat-value">{{ data.totalOrders | number }}</strong>
+        </article>
+
+        <article class="stat-card stat-card--sales">
+          <span class="stat-label">Total Revenue</span>
+          <strong class="stat-value">{{ formatCurrency(data.totalRevenue) }}</strong>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Average Order Value</span>
+          <strong class="stat-value">{{ formatCurrency(data.averageOrderValue) }}</strong>
+        </article>
+      </div>
+
+      @if (data.orders.length === 0) {
+        <div class="empty-state report-empty">
+          <h3>No orders in this period</h3>
+          <p>There are no completed sales between the selected dates.</p>
+        </div>
+      } @else {
+        <div class="report-table-panel">
+          <div class="data-table-wrapper">
+            <table class="data-table report-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of data.orders; track order.orderId) {
+                  <tr>
+                    <td>#{{ order.orderId }}</td>
+                    <td class="date-cell">{{ formatShortDate(order.orderDate) }}</td>
+                    <td>{{ order.customerName }}</td>
+                    <td class="amount-cell">{{ formatCurrency(order.totalAmount) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      @if (generatedAt; as generated) {
+        <footer class="report-print-footer print-only">
+          Generated on {{ formatGeneratedAt(generated) }}
+        </footer>
+      }
+    </div>
+  } @else {
+    <div class="empty-state report-placeholder no-print">
+      <h3>No report generated yet</h3>
+      <p>Select a date range and click Generate Report to view sales details.</p>
+    </div>
+  }
+</section>

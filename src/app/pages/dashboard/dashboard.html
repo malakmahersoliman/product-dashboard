@@ -1,106 +1,398 @@
 <section class="dashboard-page page-container">
-  <div class="page-header">
+  <div class="page-header dashboard-header">
     <div>
       <span class="eyebrow">Overview</span>
       <h2>Dashboard</h2>
-      <p class="page-subtitle">Store overview and key metrics</p>
+      <p class="page-subtitle">Live snapshot of sales, inventory, and store activity</p>
     </div>
+
+  @if (!isLoading && statistics) {
+    <div class="dashboard-header__actions no-print">
+      <button type="button" class="secondary-btn" (click)="loadDashboard()">
+        <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-7M19 5a9 9 0 00-14 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Refresh
+      </button>
+    </div>
+  }
   </div>
 
   @if (isLoading) {
     <div class="loading-block">
       <span class="spinner"></span>
-      <span>Loading statistics...</span>
+      <span>Loading dashboard...</span>
     </div>
   } @else if (errorMessage) {
     <div class="error-card">
       <p class="error-message">{{ errorMessage }}</p>
-      <button type="button" class="primary-btn" (click)="loadStatistics()">Try Again</button>
+      <button type="button" class="primary-btn" (click)="loadDashboard()">Try Again</button>
     </div>
   } @else if (statistics; as stats) {
-    <div class="stats-grid">
-      <article class="stat-card">
-        <span class="stat-label">Total Products</span>
-        <strong class="stat-value">{{ stats.products.total | number }}</strong>
+    <nav class="dashboard-quick-actions no-print" aria-label="Quick actions">
+      <a class="quick-action" routerLink="/cart">
+        <span class="quick-action__icon quick-action__icon--primary">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M6 6h15l-1.5 9h-12L6 6zm0 0L5 3H2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="quick-action__label">New Order</span>
+      </a>
+      <a class="quick-action" routerLink="/products">
+        <span class="quick-action__icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M3 7.5V19a1 1 0 001 1h16a1 1 0 001-1V7.5M3 7.5h18M3 7.5L5 4h14l2 3.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="quick-action__label">Products</span>
+      </a>
+      <a class="quick-action" routerLink="/orders">
+        <span class="quick-action__icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M7 4h10l1 4H6l1-4zM5 8h14v11a1 1 0 01-1 1H6a1 1 0 01-1-1V8z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="quick-action__label">Orders</span>
+      </a>
+      <a class="quick-action" routerLink="/reports">
+        <span class="quick-action__icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 17v-6M12 17V7M15 17v-3M5 19h14a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v12a1 1 0 001 1z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="quick-action__label">Reports</span>
+      </a>
+    </nav>
+
+    <div class="dashboard-hero">
+      <article class="hero-card hero-card--revenue">
+        <div class="hero-card__content">
+          <span class="hero-card__label">Today's Sales</span>
+          <strong class="hero-card__value">{{ formatCurrency(stats.orders.todaySales) }}</strong>
+          <p class="hero-card__hint">
+            {{ stats.orders.total | number }} total orders · {{ completionRate }}% completion rate
+          </p>
+        </div>
+        <div class="hero-card__badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2v20M17 7l-5-5-5 5M7 17l5 5 5-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
       </article>
 
-      <article class="stat-card">
-        <span class="stat-label">Total Customers</span>
-        <strong class="stat-value">{{ stats.customers.total | number }}</strong>
+      <article class="hero-card hero-card--pipeline">
+        <span class="hero-card__label">Order Pipeline</span>
+        <div class="pipeline-stats">
+          <div class="pipeline-stat pipeline-stat--pending">
+            <strong>{{ stats.orders.pending | number }}</strong>
+            <span>Pending</span>
+          </div>
+          <div class="pipeline-stat pipeline-stat--completed">
+            <strong>{{ stats.orders.completed | number }}</strong>
+            <span>Completed</span>
+          </div>
+          <div class="pipeline-stat pipeline-stat--cancelled">
+            <strong>{{ stats.orders.cancelled | number }}</strong>
+            <span>Cancelled</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="stats-grid dashboard-kpis">
+      <article class="stat-card stat-card--kpi">
+        <div class="stat-card__icon stat-card__icon--neutral">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M3 7.5V19a1 1 0 001 1h16a1 1 0 001-1V7.5M3 7.5h18M3 7.5L5 4h14l2 3.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-label">Products</span>
+          <strong class="stat-value">{{ stats.products.total | number }}</strong>
+          <span class="stat-hint">{{ stats.products.available | number }} available</span>
+        </div>
       </article>
 
-      <article class="stat-card">
-        <span class="stat-label">Total Users</span>
-        <strong class="stat-value">{{ stats.users.total | number }}</strong>
+      <article class="stat-card stat-card--kpi">
+        <div class="stat-card__icon stat-card__icon--neutral">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M16 11a4 4 0 10-8 0 4 4 0 008 0zM4 19a8 8 0 0116 0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-label">Customers</span>
+          <strong class="stat-value">{{ stats.customers.total | number }}</strong>
+        </div>
       </article>
 
-      <article class="stat-card">
-        <span class="stat-label">Total Orders</span>
-        <strong class="stat-value">{{ stats.orders.total | number }}</strong>
+      <article class="stat-card stat-card--kpi">
+        <div class="stat-card__icon stat-card__icon--neutral">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M7 4h10l1 4H6l1-4zM5 8h14v11a1 1 0 01-1 1H6a1 1 0 01-1-1V8z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-label">Orders</span>
+          <strong class="stat-value">{{ stats.orders.total | number }}</strong>
+        </div>
       </article>
 
-      <article class="stat-card stat-card--sales">
-        <span class="stat-label">Today's Sales</span>
-        <strong class="stat-value">{{ formatCurrency(stats.orders.todaySales) }}</strong>
+      <article class="stat-card stat-card--kpi">
+        <div class="stat-card__icon stat-card__icon--neutral">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20a8 8 0 0116 0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-label">Users</span>
+          <strong class="stat-value">{{ stats.users.total | number }}</strong>
+          <span class="stat-hint">{{ stats.users.superAdmins | number }} admins</span>
+        </div>
       </article>
 
-      <article class="stat-card stat-card--warning">
-        <span class="stat-label">Pending Orders</span>
-        <strong class="stat-value">{{ stats.orders.pending | number }}</strong>
+      <article class="stat-card stat-card--kpi stat-card--warning">
+        <div class="stat-card__icon stat-card__icon--warning">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 9v4m0 4h.01M10.3 4.3l-8 14A2 2 0 004 21h16a2 2 0 001.7-2.7l-8-14a2 2 0 00-3.4 0z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-label">Low Stock</span>
+          <strong class="stat-value">{{ stats.products.lowStock | number }}</strong>
+        </div>
       </article>
 
-      <article class="stat-card stat-card--danger">
-        <span class="stat-label">Low Stock Products</span>
-        <strong class="stat-value">{{ stats.products.lowStock | number }}</strong>
+      <article class="stat-card stat-card--kpi stat-card--danger">
+        <div class="stat-card__icon stat-card__icon--danger">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M18 6L6 18M6 6l12 12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-label">Out of Stock</span>
+          <strong class="stat-value">{{ stats.products.outOfStock | number }}</strong>
+        </div>
       </article>
     </div>
 
     <div class="dashboard-sections">
       <section class="dashboard-panel">
         <div class="panel-header">
-          <h3>Recent Orders</h3>
+          <div>
+            <h3>Recent Orders</h3>
+            <span class="panel-subtitle">Latest activity across the store</span>
+          </div>
+          <a class="secondary-btn panel-link" routerLink="/orders">View all</a>
         </div>
-        <div class="panel-empty">
-          <p>Recent order details are not included in the statistics endpoint.</p>
-          <a class="secondary-btn" routerLink="/orders">View All Orders</a>
-        </div>
+
+        @if (recentOrders.length === 0) {
+          <div class="panel-empty">
+            <p>No orders yet. Create your first sale to see activity here.</p>
+            <a class="primary-btn" routerLink="/cart">Create Order</a>
+          </div>
+        } @else {
+          <div class="data-table-wrapper">
+            <table class="data-table dashboard-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of recentOrders; track order.id) {
+                  <tr class="row-clickable" [routerLink]="['/orders', order.id]">
+                    <td>
+                      <a class="order-id-link" [routerLink]="['/orders', order.id]" (click)="$event.stopPropagation()">
+                        #{{ order.id }}
+                      </a>
+                    </td>
+                    <td>{{ order.customerName }}</td>
+                    <td>
+                      <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td class="amount-cell">{{ formatCurrency(order.totalAmount) }}</td>
+                    <td class="date-cell">{{ formatDate(order.orderDate) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </section>
 
       <section class="dashboard-panel">
         <div class="panel-header">
-          <h3>Low Stock Products</h3>
+          <div>
+            <h3>Inventory Alerts</h3>
+            <span class="panel-subtitle">
+              {{ stats.products.lowStock | number }} low · {{ stats.products.outOfStock | number }} out of stock
+            </span>
+          </div>
+          <a class="secondary-btn panel-link" routerLink="/products">Manage</a>
         </div>
-        <div class="panel-empty">
-          <p>
-            <strong>{{ stats.products.lowStock | number }}</strong> products are low on stock.
-            <strong>{{ stats.products.outOfStock | number }}</strong> are out of stock.
-          </p>
-          <a class="secondary-btn" routerLink="/products">View Products</a>
-        </div>
+
+        @if (lowStockProducts.length === 0) {
+          <div class="panel-empty panel-empty--success">
+            <p>All products are sufficiently stocked.</p>
+            <a class="secondary-btn" routerLink="/products">View Products</a>
+          </div>
+        } @else {
+          <div class="data-table-wrapper">
+            <table class="data-table dashboard-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (product of lowStockProducts; track product.id) {
+                  <tr class="row-clickable" [routerLink]="['/products', product.id]">
+                    <td>
+                      <a class="table-link" [routerLink]="['/products', product.id]" (click)="$event.stopPropagation()">
+                        {{ product.name }}
+                      </a>
+                    </td>
+                    <td>
+                      <span class="category-tag category-tag--muted">{{ product.categoryName }}</span>
+                    </td>
+                    <td>
+                      <span [class]="stockLevelClass(product.stock)">{{ product.stock | number }}</span>
+                    </td>
+                    <td class="amount-cell">{{ formatCurrency(product.price) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </section>
     </div>
 
     <section class="dashboard-panel sales-panel">
       <div class="panel-header">
-        <h3>Sales Overview</h3>
-        <span class="panel-subtitle">Order breakdown (live data)</span>
+        <div>
+          <h3>Order Status Breakdown</h3>
+          <span class="panel-subtitle">Distribution across all orders</span>
+        </div>
       </div>
 
-      <div class="sales-placeholder">
+      <div class="sales-chart">
         <div class="sales-bars">
           @for (bar of orderOverviewBars; track bar.label) {
             <div class="sales-bar-col">
               <span class="sales-bar-count">{{ bar.count | number }}</span>
               <div class="sales-bar-track">
-                <div class="sales-bar-fill" [style.height.%]="bar.value"></div>
+                <div
+                  class="sales-bar-fill"
+                  [class]="'sales-bar-fill--' + bar.tone"
+                  [style.height.%]="bar.value"
+                ></div>
               </div>
               <span class="sales-bar-label">{{ bar.label }}</span>
             </div>
           }
         </div>
-        <p class="sales-note">
-          Today's sales: {{ formatCurrency(stats.orders.todaySales) }}
-        </p>
+
+        <div class="sales-chart-footer">
+          <div class="sales-chart-legend">
+            <span class="legend-item legend-item--pending">Pending</span>
+            <span class="legend-item legend-item--completed">Completed</span>
+            <span class="legend-item legend-item--cancelled">Cancelled</span>
+          </div>
+          <p class="sales-note">
+            Today's revenue: <strong>{{ formatCurrency(stats.orders.todaySales) }}</strong>
+          </p>
+        </div>
       </div>
     </section>
   }

@@ -22,8 +22,10 @@ This repository is the **Angular frontend**. The companion .NET API lives in [Pr
 - **Manage catalog** (SuperAdmin) — create, edit, and delete products and categories
 - **Manage customers** — maintain customer records used at checkout
 - **Cart & checkout** — build an order from products, select a customer, and submit
-- **Track orders** — view order history; admins can update status and view details
+- **Track orders** — view order history and details; admins can update status, delete, and manage all orders
 - **Dashboard** (SuperAdmin) — aggregated stats for products, orders, customers, and users
+- **Sales reports** (SuperAdmin) — date-range sales report with print support
+- **User management** (SuperAdmin) — create and list staff accounts
 
 ---
 
@@ -76,17 +78,22 @@ src/app/
 
 | Feature | User | SuperAdmin |
 |---------|:----:|:----------:|
-| View products | ✓ | ✓ |
+| View products & product details | ✓ | ✓ |
 | Create / edit / delete products | | ✓ |
-| View categories | ✓ | ✓ |
-| Manage categories | | ✓ |
+| Manage categories (page) | | ✓ |
+| Filter products by category (dropdown) | ✓ | ✓ |
 | View customers | ✓ | ✓ |
-| Create / edit customers (UI) | | ✓ |
+| Create / edit customers | ✓ | ✓ |
+| Delete customers | | ✓ |
 | Cart & checkout | ✓ | ✓ |
-| View own orders | ✓ | |
-| View all orders & order details | | ✓ |
-| Update order status | | ✓ |
+| View orders list | ✓ | ✓ |
+| View order details (read-only) | ✓ | ✓ |
+| Update / delete orders | | ✓ |
 | Dashboard statistics | | ✓ |
+| Sales reports | | ✓ |
+| User management | | ✓ |
+
+> **Note:** Regular users see their own orders in the list (filtered by the API). SuperAdmins see all orders and get admin action buttons. Category names are available to all staff via the product filter; only SuperAdmins can open the Categories management page.
 
 ---
 
@@ -95,18 +102,22 @@ src/app/
 | Path | Description | Guard |
 |------|-------------|-------|
 | `/login` | Sign in | — |
+| `/dashboard` | Admin statistics | Auth + Role |
+| `/categories` | Category management | Auth + Role |
 | `/products` | Product catalog | Auth |
 | `/products/new` | Add product | Auth + Role |
 | `/products/:id` | Product details | Auth |
 | `/products/:id/edit` | Edit product | Auth + Role |
 | `/customers` | Customer list | Auth |
-| `/customers/new` | Add customer | Auth + Role |
-| `/customers/:id/edit` | Edit customer | Auth + Role |
+| `/customers/new` | Add customer | Auth |
+| `/customers/:id/edit` | Edit customer | Auth |
 | `/cart` | Shopping cart & checkout | Auth |
 | `/orders` | Order list | Auth |
-| `/orders/:id` | Order details | Auth + Role |
-| `/dashboard` | Admin statistics | Auth + Role |
-| `/categories` | Category management | Auth + Role |
+| `/orders/:id` | Order details | Auth |
+| `/orders/new` | Redirects to `/cart` | — |
+| `/reports` | Sales report | Auth + Role |
+| `/users` | User list | Auth + Role |
+| `/users/new` | Create user | Auth + Role |
 
 ---
 
@@ -120,6 +131,8 @@ src/app/
 | `CustomerService` | `/api/customers` | Customer CRUD (cached) |
 | `OrderService` | `/api/orders` | Orders list, create, status update |
 | `StatisticsService` | `/api/statistics` | Dashboard aggregates |
+| `ReportService` | `/api/reports` | Sales reports by date range |
+| `UserService` | `/api/users` | User list and create |
 | `CartService` | — (local) | Cart state, localStorage persistence |
 
 API URL is configured in `src/environments/environment.ts`:
@@ -171,8 +184,8 @@ Uses [Vitest](https://vitest.dev/) via Angular's unit test builder.
 2. **Browse products** → add items to cart (quantities respect stock)
 3. **Open cart** → select customer, payment method, place order
 4. **Backend** validates stock, decrements inventory, creates order in a transaction
-5. **Orders page** shows history (users see their own; admins see all)
-6. **Dashboard** (admin) shows store-wide metrics
+5. **Orders page** shows history (users see their own; admins see all and can manage status)
+6. **Dashboard** (admin) shows store-wide metrics; **Reports** generates printable sales summaries
 
 ---
 

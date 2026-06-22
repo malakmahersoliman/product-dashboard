@@ -85,6 +85,12 @@ export const routes: Routes = [
       import('./pages/dashboard/dashboard').then(m => m.Dashboard),
    },
    {
+    path: 'reports',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+      import('./pages/reports/reports').then(m => m.Reports),
+   },
+   {
     path: 'categories',
     canActivate: [AuthGuard, RoleGuard],
     loadComponent: () =>
@@ -101,6 +107,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     loadComponent: () =>
         import('./pages/create-user/create-user').then(m => m.CreateUser),
+   },
+   {
+    path: 'users/:id/edit',
+    canActivate: [AuthGuard, RoleGuard],
+    loadComponent: () =>
+        import('./pages/edit-user/edit-user').then(m => m.EditUser),
    },
    {
     path:'**',

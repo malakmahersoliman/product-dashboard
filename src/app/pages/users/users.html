@@ -11,6 +11,10 @@
     </a>
   </div>
 
+  @if (successMessage()) {
+    <p class="success-message">{{ successMessage() }}</p>
+  }
+
   @if (isLoading()) {
     <div class="loading-block">
       <span class="spinner"></span>
@@ -71,7 +75,10 @@
         </div>
       </div>
     } @else {
-      <app-user-table [users]="filteredUsers()" />
+      <app-user-table
+        [users]="filteredUsers()"
+        (deleteUser)="deleteUser($event)"
+      />
     }
   }
 </section>

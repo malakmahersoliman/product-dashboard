@@ -262,16 +262,16 @@ export class Orders implements OnInit {
   }
 
   getPaymentStatusClass(paymentStatus: string | null | undefined): string {
-    const status = paymentStatus || 'Unpaid';
+    const status = paymentStatus || PAYMENT_STATUS.unpaid;
 
     switch (status) {
-      case 'Paid':
+      case PAYMENT_STATUS.paid:
         return 'payment-badge payment-badge--paid';
 
-      case 'Refunded':
+      case PAYMENT_STATUS.refunded:
         return 'payment-badge payment-badge--refunded';
 
-      case 'PaymentFailed':
+      case PAYMENT_STATUS.paymentFailed:
         return 'payment-badge payment-badge--failed';
 
       default:
@@ -280,7 +280,7 @@ export class Orders implements OnInit {
   }
 
   getPaymentStatusLabel(paymentStatus: string | null | undefined): string {
-    return paymentStatus || 'Unpaid';
+    return paymentStatus || PAYMENT_STATUS.unpaid;
   }
 
   onPageChange(pageNumber: number): void {

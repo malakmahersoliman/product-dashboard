@@ -26,6 +26,7 @@ export class Users implements OnInit {
   users = signal<User[]>([]);
   isLoading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
   appliedSearchTerm = signal('');
 
   readonly defaultUserFilterValues: FilterValues = {
@@ -69,6 +70,33 @@ export class Users implements OnInit {
 
   clearFilters(): void {
     this.filterPanel?.onReset();
+  }
+
+  deleteUser(id: number): void {
+    const confirmed = confirm('Are you sure you want to delete this user?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    this.userService.deleteUser(id).subscribe({
+      next: () => {
+        this.successMessage.set('User deleted successfully.');
+        this.loadUsers();
+      },
+      error: (error) => {
+        if (error.status === 409) {
+          this.errorMessage.set(
+            'This user cannot be deleted because they are linked to existing orders.'
+          );
+        } else {
+          this.errorMessage.set('Failed to delete user.');
+        }
+      },
+    });
   }
 
   filteredUsers = computed(() => {
