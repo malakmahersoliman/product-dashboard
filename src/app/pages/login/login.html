@@ -25,8 +25,8 @@
         }
       </div>
 
-      <button type="submit" class="primary-btn login-submit" [disabled]="isSubmitting">
-        @if (isSubmitting) {
+      <button type="submit" class="primary-btn login-submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
           Logging in...
         } @else {
           Login
@@ -34,8 +34,8 @@
       </button>
     </form>
 
-    @if (errorMessage) {
-      <p class="error-message">{{ errorMessage }}</p>
+    @if (errorMessage(); as message) {
+      <p class="error-message" role="alert">{{ message }}</p>
     }
 
   </div>
