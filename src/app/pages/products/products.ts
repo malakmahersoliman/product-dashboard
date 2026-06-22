@@ -231,7 +231,12 @@ export class Products implements OnInit {
 
   onFilterSearch(event: ListFilterSearchEvent): void {
     this.searchTerm = String(event.values['search'] ?? '');
-    this.selectedCategoryId = event.values['categoryId'] as number | null;
+
+    const categoryId = event.values['categoryId'];
+    this.selectedCategoryId =
+      categoryId === null || categoryId === undefined || categoryId === ''
+        ? null
+        : Number(categoryId);
 
     const availability = event.values['availability'];
     this.selectedAvailability =

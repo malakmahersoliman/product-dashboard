@@ -21,12 +21,14 @@ export class ListFilterPanel implements OnChanges {
   @Input() title = '';
   @Input() subtitle = '';
   @Input() searchLabel = 'Apply';
+  @Input() searchLabelPending = 'Apply changes';
   @Input() resetLabel = 'Reset';
-  @Input() activeFiltersLabel = 'Filtered by';
+  @Input() activeFiltersLabel = 'Applied filters';
   @Input() clearAllLabel = 'Clear all';
   @Input() disabled = false;
   @Input() collapsible = false;
-  @Input() refineLabel = 'More filters';
+  @Input() refineLabel = 'Filters';
+  @Input() refineLabelExpanded = 'filters';
 
   @Output() search = new EventEmitter<ListFilterSearchEvent>();
   @Output() reset = new EventEmitter<ListFilterSearchEvent>();
@@ -93,6 +95,16 @@ export class ListFilterPanel implements OnChanges {
     return this.activeChips.length > 0;
   }
 
+  get activeRefineFilterCount(): number {
+    return this.refineFields.filter(
+      (field) => !this.isDefaultValue(field.key, this.appliedValues[field.key])
+    ).length;
+  }
+
+  get applyButtonLabel(): string {
+    return this.hasPendingChanges ? this.searchLabelPending : this.searchLabel;
+  }
+
   getDraftValue(key: string): FilterFieldValue {
     return this.draftValues[key] ?? null;
   }
@@ -124,6 +136,10 @@ export class ListFilterPanel implements OnChanges {
 
     this.appliedValues = { ...this.draftValues };
     this.search.emit({ values: this.appliedValues });
+
+    if (this.collapsible) {
+      this.filtersExpanded = false;
+    }
   }
 
   onReset(): void {

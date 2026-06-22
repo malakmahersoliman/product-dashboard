@@ -63,8 +63,8 @@ export class Orders implements OnInit {
     {
       key: 'search',
       type: 'search',
-      label: 'Order #',
-      chipLabel: 'Order #',
+      label: 'Order number',
+      chipLabel: 'Order number',
       placeholder: 'e.g. 1042',
       ariaLabel: 'Search by order number',
     },

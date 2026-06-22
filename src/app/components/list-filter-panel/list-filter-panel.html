@@ -34,11 +34,45 @@
     }
 
     <div class="list-filter-toolbar__actions">
-      @if (hasPendingChanges) {
-        <span class="list-filter-toolbar__pending" aria-live="polite" title="Unapplied changes">
-          <span class="list-filter-toolbar__pending-dot" aria-hidden="true"></span>
-          Draft
-        </span>
+      @if (refineFields.length > 0 && collapsible) {
+        <button
+          type="button"
+          class="secondary-btn list-filter-toolbar__filter-toggle"
+          (click)="toggleFiltersExpanded()"
+          [disabled]="disabled"
+          [class.list-filter-toolbar__filter-toggle--active]="
+            filtersExpanded || activeRefineFilterCount > 0
+          "
+          [attr.aria-expanded]="filtersExpanded"
+          [attr.aria-label]="
+            (filtersExpanded ? 'Close filters' : 'Open filters') +
+            (activeRefineFilterCount > 0
+              ? ', ' + activeRefineFilterCount + ' active filters'
+              : '')
+          "
+          aria-controls="list-filter-refine-panel"
+        >
+          <svg
+            class="list-filter-toolbar__filter-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 6h16" />
+            <path d="M7 12h10" />
+            <path d="M10 18h4" />
+          </svg>
+
+          @if (activeRefineFilterCount > 0) {
+            <span class="list-filter-toolbar__more-count" aria-hidden="true">
+              {{ activeRefineFilterCount }}
+            </span>
+          }
+        </button>
       }
 
       <button
@@ -55,37 +89,17 @@
         class="primary-btn list-filter-toolbar__apply-btn"
         (click)="onSearch()"
         [disabled]="disabled"
+        [attr.aria-label]="hasPendingChanges ? applyButtonLabel : searchLabel"
       >
-        {{ searchLabel }}
+        {{ applyButtonLabel }}
       </button>
     </div>
   </div>
 
-  @if (refineFields.length > 0) {
-    @if (collapsible) {
-      <button
-        type="button"
-        class="list-filter-toolbar__more-toggle"
-        (click)="toggleFiltersExpanded()"
-        [attr.aria-expanded]="filtersExpanded"
-        aria-controls="list-filter-refine-panel"
-      >
-        <span>{{ refineLabel }}</span>
-        <span class="list-filter-toolbar__more-icon" aria-hidden="true">
-          {{ filtersExpanded ? '−' : '+' }}
-        </span>
-      </button>
-    }
-
-    @if (!collapsible || filtersExpanded) {
-      <div
-        id="list-filter-refine-panel"
-        class="list-filter-toolbar__refine"
-        [class.list-filter-toolbar__refine--expanded]="filtersExpanded"
-      >
-        <ng-container *ngTemplateOutlet="refineFieldsTemplate"></ng-container>
-      </div>
-    }
+  @if (refineFields.length > 0 && (!collapsible || filtersExpanded)) {
+    <div id="list-filter-refine-panel" class="list-filter-toolbar__refine">
+      <ng-container *ngTemplateOutlet="refineFieldsTemplate"></ng-container>
+    </div>
   }
 
   @if (hasActiveAppliedFilters) {
@@ -101,7 +115,7 @@
             [disabled]="disabled"
             [attr.aria-label]="'Remove ' + chip.label + ': ' + chip.valueLabel"
           >
-            <span class="filter-chip__value">{{ chip.valueLabel }}</span>
+            <span class="filter-chip__value">{{ chip.label }}: {{ chip.valueLabel }}</span>
             <span class="filter-chip__remove" aria-hidden="true">×</span>
           </button>
         }

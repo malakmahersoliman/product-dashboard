@@ -1,15 +1,15 @@
 .list-filter-toolbar {
   display: grid;
-  gap: 12px;
-  padding: 16px 18px;
+  gap: 0;
+  padding: 1.25rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 4%);
 }
 
 .list-filter-toolbar__header {
-  padding-bottom: 2px;
+  padding-bottom: 0.75rem;
 }
 
 .list-filter-toolbar__title {
@@ -26,27 +26,27 @@
 
 .list-filter-toolbar__primary {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
+  align-items: end;
+  gap: 1rem;
 }
 
 .list-filter-toolbar__search-group {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   flex: 1;
-  gap: 10px;
+  gap: 0.75rem;
   min-width: 0;
 }
 
 .list-filter-toolbar__search-field {
   display: grid;
-  gap: 5px;
-  flex: 1;
+  gap: 0.45rem;
   min-width: 0;
 }
 
 .list-filter-toolbar__field-label {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -55,101 +55,109 @@
 .list-filter-toolbar__search-field .search-input {
   width: 100%;
   min-width: 0;
-  min-height: 42px;
+  min-height: 38px;
 }
 
 .list-filter-toolbar__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.65rem;
+  flex-wrap: wrap;
   flex-shrink: 0;
 }
 
-.list-filter-toolbar__pending {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--color-muted);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.list-filter-toolbar__pending-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-warning);
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
-}
-
+.list-filter-toolbar__filter-toggle,
 .list-filter-toolbar__reset-btn,
 .list-filter-toolbar__apply-btn {
-  min-height: 42px;
+  min-height: 38px;
   white-space: nowrap;
 }
 
-.list-filter-toolbar__apply-btn {
-  min-width: 88px;
-}
-
-.list-filter-toolbar__more-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
+.list-filter-toolbar__filter-toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
   padding: 0;
-  border: none;
-  background: transparent;
+  border-radius: 10px;
+}
+
+.list-filter-toolbar__filter-toggle:hover:not(:disabled) {
+  border-color: var(--color-primary-border);
   color: var(--color-primary);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
+  background: var(--color-primary-soft);
 }
 
-.list-filter-toolbar__more-toggle:hover {
-  color: var(--color-primary-hover);
+.list-filter-toolbar__filter-toggle--active {
+  border-color: var(--color-primary-border);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
 }
 
-.list-filter-toolbar__more-icon {
+.list-filter-toolbar__filter-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.list-filter-toolbar__filter-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.list-filter-toolbar__more-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
+  min-width: 18px;
   height: 18px;
-  border: 1px solid var(--color-primary-border);
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
   line-height: 1;
 }
 
-.list-filter-toolbar__refine {
-  display: grid;
-  gap: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--color-border-light);
+.list-filter-toolbar__filter-toggle .list-filter-toolbar__more-count {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid var(--color-surface);
 }
 
-.list-filter-toolbar__refine .list-filter-toolbar__selects {
-  margin-top: 2px;
+.list-filter-toolbar__apply-btn {
+  min-width: 72px;
+}
+
+.list-filter-toolbar__refine {
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--color-border-light);
+  display: grid;
+  gap: 1rem;
 }
 
 .list-filter-toolbar__selects {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .list-filter-toolbar__select-field {
   display: grid;
-  gap: 5px;
+  gap: 0.45rem;
   min-width: 0;
 }
 
 .list-filter-toolbar__select-field select {
   width: 100%;
-  min-height: 40px;
+  min-height: 38px;
   padding: 8px 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -172,48 +180,53 @@
 
 .list-filter-toolbar__segments {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 12px 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
 }
 
 .list-filter-toolbar__segment {
   display: grid;
-  gap: 6px;
+  gap: 0.6rem;
 }
 
 .segmented-control {
-  display: inline-flex;
+  display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-inset);
-  width: fit-content;
+  gap: 0.4rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
   max-width: 100%;
 }
 
 .segmented-control__btn {
-  padding: 7px 12px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
+  min-height: 38px;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
   color: var(--color-muted);
   font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .segmented-control__btn:hover:not(:disabled) {
-  color: var(--color-text);
+  border-color: var(--color-primary-border);
+  color: var(--color-primary);
+}
+
+.segmented-control__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .segmented-control__btn--active {
-  background: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-border);
+  color: var(--color-primary);
 }
 
 .segmented-control__btn:disabled {
@@ -226,7 +239,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding-top: 10px;
+  margin-top: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid var(--color-border-light);
 }
 
@@ -249,6 +263,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 24px;
   padding: 5px 10px;
   border: 1px solid var(--color-border);
   border-radius: 999px;
@@ -256,7 +271,7 @@
   color: var(--color-text);
   font: inherit;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -264,6 +279,11 @@
 .filter-chip:hover:not(:disabled) {
   border-color: var(--color-primary-border);
   background: var(--color-primary-soft);
+}
+
+.filter-chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .filter-chip:disabled {
@@ -287,10 +307,17 @@
   cursor: pointer;
   padding: 0;
   margin-left: auto;
+  min-height: 24px;
 }
 
 .list-filter-toolbar__clear-all:hover:not(:disabled) {
   text-decoration: underline;
+}
+
+.list-filter-toolbar__clear-all:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .list-filter-toolbar__clear-all:disabled {
@@ -298,26 +325,35 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .list-filter-toolbar__primary {
-    flex-direction: column;
     align-items: stretch;
+    flex-direction: column;
   }
 
   .list-filter-toolbar__search-group {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .list-filter-toolbar__actions {
     justify-content: flex-end;
   }
 
-  .segmented-control {
-    width: 100%;
+  .list-filter-toolbar__segments {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .list-filter-toolbar__actions {
+    display: grid;
+    grid-template-columns: 38px 1fr 1fr;
+    gap: 0.65rem;
   }
 
-  .segmented-control__btn {
-    flex: 1 1 auto;
-    text-align: center;
+  .list-filter-toolbar__filter-toggle,
+  .list-filter-toolbar__apply-btn,
+  .list-filter-toolbar__reset-btn {
+    width: 100%;
   }
 }
