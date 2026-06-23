@@ -20,6 +20,7 @@ export class Reports {
   report: SalesReport | null = null;
   generatedAt: Date | null = null;
   isLoading = false;
+  isDownloadingPdf = false;
   errorMessage: string | null = null;
   validationMessage: string | null = null;
 
@@ -57,12 +58,40 @@ export class Reports {
     });
   }
 
-  printReport(): void {
-    if (!this.report) {
+  downloadPdf(): void {
+    this.validationMessage = null;
+    this.errorMessage = null;
+
+    if (!this.fromDate || !this.toDate) {
+      this.validationMessage = 'Please select both start and end dates.';
       return;
     }
 
-    window.print();
+    if (this.fromDate > this.toDate) {
+      this.validationMessage = 'Start date must be on or before end date.';
+      return;
+    }
+
+    this.isDownloadingPdf = true;
+    this.cdr.markForCheck();
+
+    this.reportService.downloadSalesReportPdf(this.fromDate, this.toDate).subscribe({
+      next: (pdfBlob) => {
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sales-report-${this.fromDate}-to-${this.toDate}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+        this.isDownloadingPdf = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.errorMessage = 'Unable to generate the PDF report. Please try again.';
+        this.isDownloadingPdf = false;
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   formatCurrency(amount: number): string {

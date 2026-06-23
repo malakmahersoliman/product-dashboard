@@ -44,10 +44,35 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
+    const token = this.getToken();
+
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      if (!payload.exp) {
+        return false;
+      }
+
+      const isExpired = payload.exp * 1000 < Date.now();
+
+      if (isExpired) {
+        this.logout();
+        return false;
+      }
+
+      return true;
+    } catch {
+      this.logout();
+      return false;
+    }
+}
 
   isSuperAdmin(): boolean {
     return this.getRole() === 'SuperAdmin';
   }
+  
 }

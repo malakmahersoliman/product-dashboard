@@ -37,10 +37,14 @@
       <button
         type="button"
         class="secondary-btn"
-        (click)="printReport()"
-        [disabled]="!report || isLoading"
+        (click)="downloadPdf()"
+        [disabled]="isDownloadingPdf || isLoading || !fromDate || !toDate"
       >
-        Print
+        @if (isDownloadingPdf) {
+          Generating PDF...
+        } @else {
+          Download PDF
+        }
       </button>
     </div>
   </div>

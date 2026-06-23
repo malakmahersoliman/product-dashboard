@@ -77,3 +77,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+.product-card__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--color-surface-muted);
+}

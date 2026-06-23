@@ -15,7 +15,9 @@ import { environment } from '../../environments/environment';
 })
 export class ProductService {
   private readonly http = inject(HttpClient);
+
   private readonly apiUrl = `${environment.apiUrl}/products`;
+  private readonly serverUrl = environment.serverUrl;
 
   getProducts(filters: ProductFilterParams): Observable<PagedResult<Product>> {
     let params = new HttpParams()
@@ -63,5 +65,13 @@ export class ProductService {
 
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getImageUrl(imagePath?: string | null): string {
+    if (!imagePath) {
+      return 'assets/images/product-placeholder.png';
+    }
+
+    return `${this.serverUrl}${imagePath}`;
   }
 }

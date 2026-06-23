@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   stock: number;
   isAvailable: boolean;
+  imagePath?: string | null;
 }
 
 export interface CreateProductRequest {
@@ -14,6 +15,7 @@ export interface CreateProductRequest {
   price: number;
   stock: number;
   isAvailable: boolean;
+  imagePath?: string | null;
 }
 
 export interface UpdateProductRequest {
@@ -22,6 +24,7 @@ export interface UpdateProductRequest {
   price: number;
   stock: number;
   isAvailable: boolean;
+
 }
 export interface ProductFilterParams {
   search?: string;

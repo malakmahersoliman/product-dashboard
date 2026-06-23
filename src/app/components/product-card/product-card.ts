@@ -4,6 +4,8 @@ import { Product } from '../../models/product.model';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import{ ProductService } from '../../services/product.service';
+
 
 @Component({
   selector: 'app-product-card',
@@ -17,6 +19,8 @@ export class ProductCard {
 
   authService = inject(AuthService);
   cartService = inject(CartService);
+   productService = inject(ProductService);
+
   private cdr = inject(ChangeDetectorRef);
 
   constructor() {
@@ -93,5 +97,11 @@ export class ProductCard {
       return 'Low Stock';
     }
     return 'Available';
+  }
+
+  onImageError(event: Event): void {
+    const image = event.target as HTMLImageElement;
+
+    image.src = 'https://placehold.net/400x400.png';
   }
 }

@@ -13,6 +13,12 @@
   </div>
 
   <h3 class="product-name">{{ product.name }}</h3>
+      <img
+        class="product-card__image"
+        [src]="productService.getImageUrl(product.imagePath)"
+        [alt]="product.name + ' product image'"
+        (error)="onImageError($event)"
+      />
 
   <div class="product-meta">
     <div class="meta-row">

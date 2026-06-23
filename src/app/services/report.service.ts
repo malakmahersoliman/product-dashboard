@@ -16,4 +16,10 @@ export class ReportService {
       params: { from, to },
     });
   }
+  downloadSalesReportPdf(from: string, to: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/sales/pdf`, {
+      params: { from, to },
+      responseType: 'blob',
+    });
+  }
 }
